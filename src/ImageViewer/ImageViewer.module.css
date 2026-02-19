@@ -6,6 +6,7 @@
   inset: 0;
   justify-content: center;
   position: fixed;
+  user-select: none;
   z-index: 9999;
 }
 

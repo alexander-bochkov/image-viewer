@@ -6,8 +6,6 @@ type ImageViewerProps = {
 };
 
 export const ImageViewer = ({ imageUrl, onClose }: ImageViewerProps) => {
-  console.log(imageUrl);
-
   return (
     <div className={styles.imageViewer}>
       <button className={styles.closeBtn} onClick={onClose}>
