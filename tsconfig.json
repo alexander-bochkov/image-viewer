@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    /* Completeness */
+    "skipLibCheck": true,
+
+    /* Emit */
+    "noEmit": true,
+
+    /* Interop Constraints */
+    "isolatedModules": true,
+
+    /* Language and Environment */
+    "jsx": "preserve",
+    "moduleDetection": "force",
+    "target": "esnext",
+
+    /* Modules */
+    "baseUrl": "src",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+
+    /* Type Checking */
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true
+  }
+}
