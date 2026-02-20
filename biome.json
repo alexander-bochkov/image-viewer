@@ -4,6 +4,28 @@
     "actions": {
       "source": {
         "noDuplicateClasses": "on",
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              {
+                "source": [":PACKAGE:", "!hooks/**", "!types/**"],
+                "type": false
+              },
+              { "source": ":PACKAGE:", "type": false },
+              { "source": [":PATH:", "!**/*.css"], "type": false },
+              ":BLANK_LINE:",
+              {
+                "source": [":PACKAGE:", "!hooks/**", "!types/**"],
+                "type": true
+              },
+              { "source": ":PACKAGE:", "type": true },
+              { "source": ":PATH:", "type": true },
+              ":BLANK_LINE:",
+              "**/*.css"
+            ]
+          }
+        },
         "useSortedAttributes": "on",
         "useSortedInterfaceMembers": "on",
         "useSortedKeys": "on",
@@ -20,6 +42,18 @@
   "formatter": {
     "formatWithErrors": true,
     "useEditorconfig": true
+  },
+  "linter": {
+    "rules": {
+      "style": {
+        "useImportType": {
+          "level": "info",
+          "options": {
+            "style": "separatedType"
+          }
+        }
+      }
+    }
   },
   "vcs": {
     "clientKind": "git",
