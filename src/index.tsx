@@ -1,14 +1,18 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { App } from "./App";
 
-import { App } from "App";
+(() => {
+  const bodyEl = document.querySelector("body");
 
-const rootEl = document.createElement("image-viewer-root");
+  if (!bodyEl) return;
 
-createRoot(rootEl).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+  const rootEl = document.createElement("image-viewer-root");
+  bodyEl.appendChild(rootEl);
 
-document.querySelector("body")?.appendChild(rootEl);
+  createRoot(rootEl).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+})();
