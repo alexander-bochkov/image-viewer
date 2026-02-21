@@ -35,6 +35,7 @@
     "includes": [
       "**",
       "!public/manifest.json",
+      "!bun.lock",
       "!package.json",
       "!tsconfig.json"
     ]
