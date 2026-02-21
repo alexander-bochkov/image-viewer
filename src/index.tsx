@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { App } from "./App";
+import { ImageViewer } from "./ImageViewer";
 
 import "./global.css";
 
@@ -14,7 +14,7 @@ import "./global.css";
 
   createRoot(rootEl).render(
     <StrictMode>
-      <App />
+      <ImageViewer />
     </StrictMode>,
   );
 })();
