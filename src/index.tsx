@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import ViewerTrigger from "features/viewer-trigger";
 import { ImageViewer } from "./ImageViewer";
 
 import "./global.css";
@@ -14,7 +15,11 @@ import "./global.css";
 
   createRoot(rootEl).render(
     <StrictMode>
-      <ImageViewer />
+      <ViewerTrigger>
+        {({ imageSrc, onViewerClose }) => (
+          <ImageViewer imageUrl={imageSrc} onClose={onViewerClose} />
+        )}
+      </ViewerTrigger>
     </StrictMode>,
   );
 })();
