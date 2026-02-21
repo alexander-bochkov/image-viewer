@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App";
 
 (() => {
-  const bodyEl = document.querySelector("body");
+  const bodyEl = document.body;
 
   if (!bodyEl) return;
 
