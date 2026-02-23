@@ -1,25 +1,14 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import ViewerTrigger from "features/viewer-trigger";
-import { ImageViewer } from "./ImageViewer";
+import Viewer from "features/viewer";
 
 import "./global.css";
 
-(() => {
-  const bodyEl = document.body;
+const rootEl = document.createElement("viewer-root");
+document.body.appendChild(rootEl);
 
-  if (!bodyEl) return;
-
-  const rootEl = document.createElement("image-viewer-root");
-  bodyEl.appendChild(rootEl);
-
-  createRoot(rootEl).render(
-    <StrictMode>
-      <ViewerTrigger>
-        {({ imageSrc, onViewerClose }) => (
-          <ImageViewer imageUrl={imageSrc} onClose={onViewerClose} />
-        )}
-      </ViewerTrigger>
-    </StrictMode>,
-  );
-})();
+createRoot(rootEl).render(
+  <StrictMode>
+    <Viewer />
+  </StrictMode>,
+);
