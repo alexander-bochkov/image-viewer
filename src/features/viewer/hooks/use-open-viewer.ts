@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from "react";
 const DEFAULT_TOTAL_MOVEMENT = { x: 0, y: 0 };
 const LEFT_MOUSE_BUTTON = 0;
 const MOVEMENT_THRESHOLD = 3;
-const OPENING_DELAY = 500;
+const OPENING_DELAY = 300;
 
 type TimerID = ReturnType<typeof setTimeout>;
 
