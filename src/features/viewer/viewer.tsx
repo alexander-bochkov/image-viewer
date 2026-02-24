@@ -26,7 +26,7 @@ const Viewer = () => {
   useHidePageScrollbar(!!imageSrc);
 
   return (
-    <ModalWindow ref={modalWindowRef}>
+    <ModalWindow onClose={handleViewerClose} ref={modalWindowRef}>
       {imageSrc && <ImageViewer src={imageSrc} />}
     </ModalWindow>
   );

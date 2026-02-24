@@ -14,3 +14,9 @@
     backdrop-filter: blur(10px);
   }
 }
+
+.closeBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
