@@ -9,24 +9,14 @@
           "options": {
             "groups": [
               {
-                "source": [
-                  ":PACKAGE:",
-                  "!features/**",
-                  "!icons/**",
-                  "!types/**"
-                ],
+                "source": [":PACKAGE:", "!features/**", "!shared/**"],
                 "type": false
               },
               { "source": ":PACKAGE:", "type": false },
               { "source": [":PATH:", "!**/*.css"], "type": false },
               ":BLANK_LINE:",
               {
-                "source": [
-                  ":PACKAGE:",
-                  "!features/**",
-                  "!icons/**",
-                  "!types/**"
-                ],
+                "source": [":PACKAGE:", "!features/**", "!shared/**"],
                 "type": true
               },
               { "source": ":PACKAGE:", "type": true },

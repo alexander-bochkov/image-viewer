@@ -3,7 +3,7 @@ import ImageViewer from "features/image-viewer";
 import { ModalWindow } from "./components/ModalWindow";
 import { useCloseViewer, useHidePageScrollbar, useOpenViewer } from "./hooks";
 
-import type { Nullable } from "types/utility-types";
+import type { Nullable } from "shared/types";
 
 const Viewer = () => {
   const modalWindowRef = useRef<HTMLDialogElement>(null);

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { XMark } from "icons";
+import { XMark } from "shared/icons";
 
 import styles from "./close-button.module.css";
 
