@@ -26,3 +26,9 @@
     scale: 0.8;
   }
 }
+
+.icon {
+  width: 30px;
+  height: 30px;
+  fill: currentColor;
+}

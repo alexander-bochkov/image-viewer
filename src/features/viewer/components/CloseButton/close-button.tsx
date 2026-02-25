@@ -1,6 +1,5 @@
 import clsx from "clsx";
-
-import type { PropsWithChildren } from "react";
+import { XMark } from "icons";
 
 import styles from "./close-button.module.css";
 
@@ -9,16 +8,12 @@ type CloseButtonProps = {
   onClick: () => void;
 };
 
-export const CloseButton = ({
-  children,
-  className,
-  onClick,
-}: PropsWithChildren<CloseButtonProps>) => (
+export const CloseButton = ({ className, onClick }: CloseButtonProps) => (
   <button
     className={clsx(styles.closeButton, className)}
     onClick={onClick}
     type="button"
   >
-    {children}
+    <XMark className={styles.icon} />
   </button>
 );
