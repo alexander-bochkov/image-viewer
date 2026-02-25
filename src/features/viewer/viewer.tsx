@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { ImageViewer } from "./components/ImageViewer";
+import ImageViewer from "features/image-viewer";
 import { ModalWindow } from "./components/ModalWindow";
 import { useCloseViewer, useHidePageScrollbar, useOpenViewer } from "./hooks";
 
