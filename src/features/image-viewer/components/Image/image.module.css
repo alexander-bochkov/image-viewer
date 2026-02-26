@@ -1,6 +1,12 @@
+.intaractiveWrapper {
+  padding: 0;
+  outline: none;
+  background: none;
+  border: none;
+}
+
 .image {
+  display: block;
   width: auto;
-  max-width: 100%;
   height: auto;
-  max-height: 100%;
 }
