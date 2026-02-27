@@ -1,2 +1,3 @@
-export * from "./use-update-fit-scale";
+export * from "./use-drag";
+export * from "./use-resize";
 export * from "./use-zoom";

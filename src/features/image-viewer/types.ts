@@ -1,1 +1,3 @@
-export type Zoom = "in" | "out";
+export type Position = { x: number; y: number };
+
+export type Scale = "fit" | number;

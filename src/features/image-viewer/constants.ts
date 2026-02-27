@@ -1,3 +1,3 @@
-export const MAX_FIT_SCALE = 1;
-export const MAX_SCALE = 4;
-export const SCALE_FACTOR = 0.3;
+export const DEFAULT_POSITION = { x: 0, y: 0 };
+
+export const FULL_SIZE_SCALE = 1;

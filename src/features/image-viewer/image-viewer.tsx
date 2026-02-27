@@ -1,64 +1,30 @@
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { Container } from "./components/Container";
 import { Image } from "./components/Image";
-import { Layout } from "./components/Layout";
-import { MAX_FIT_SCALE, MAX_SCALE, SCALE_FACTOR } from "./constants";
-import { useUpdateFitScale, useZoom } from "./hooks";
+import { DEFAULT_POSITION } from "./constants";
+import { useDrag, useResize, useZoom } from "./hooks";
 
-import type { Zoom } from "./types";
+import type { Position, Scale } from "./types";
 
 type ImageViewerProps = {
   src: string;
 };
 
 const ImageViewer = ({ src }: ImageViewerProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
-  const [fitScale, setFitScale] = useState<number>(MAX_FIT_SCALE);
-  const [currentScale, setCurrentScale] = useState<number>(fitScale);
+  const [position, setPosition] = useState<Position>(DEFAULT_POSITION);
+  const [scale, setScale] = useState<Scale>("fit");
 
-  const handleFitScaleUpdate = useCallback(
-    (nextFitScale: number) => {
-      if (fitScale >= currentScale) {
-        setCurrentScale(nextFitScale);
-      }
-
-      setFitScale(nextFitScale);
-    },
-    [fitScale, currentScale],
-  );
-
-  const handleZoom = useCallback(
-    (zoom: Zoom) => {
-      setCurrentScale((prevCurrentScale) => {
-        if (zoom === "in") {
-          const nextScale = prevCurrentScale + SCALE_FACTOR;
-          return nextScale <= MAX_SCALE ? nextScale : MAX_SCALE;
-        }
-
-        const nextScale = prevCurrentScale - SCALE_FACTOR;
-        return nextScale >= fitScale ? nextScale : fitScale;
-      });
-    },
-    [fitScale],
-  );
-
-  useUpdateFitScale({ handler: handleFitScaleUpdate, imageRef });
-  useZoom(handleZoom);
-
-  const handleDoubleClick = () => {
-    const isFitted = fitScale === currentScale;
-    setCurrentScale(isFitted ? MAX_FIT_SCALE : fitScale);
-  };
+  useDrag({ containerRef, imageRef, setPosition });
+  useResize({ containerRef, imageRef, setScale });
+  useZoom({ containerRef, imageRef, setPosition, setScale });
 
   return (
-    <Layout>
-      <Image
-        onDoubleClick={handleDoubleClick}
-        ref={imageRef}
-        scale={currentScale}
-        src={src}
-      />
-    </Layout>
+    <Container ref={containerRef}>
+      <Image position={position} ref={imageRef} scale={scale} src={src} />
+    </Container>
   );
 };
 
