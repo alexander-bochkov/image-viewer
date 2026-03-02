@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { FULL_SIZE_SCALE } from "../constants";
-import { calculateImageScaleInContainer } from "../utils";
+import { getImageNaturalScale } from "../utils";
 
 import type { RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
@@ -25,10 +25,13 @@ export const useResize = ({
       setScale((prevScale) => {
         if (prevScale === "fit") return prevScale;
 
-        const imageScale = calculateImageScaleInContainer(imageEl, containerEl);
+        const imageNaturalScale = getImageNaturalScale({
+          containerEl,
+          imageEl,
+        });
 
         const canBeFitted = prevScale <= FULL_SIZE_SCALE;
-        const shouldBeFitted = prevScale < imageScale;
+        const shouldBeFitted = prevScale < imageNaturalScale;
 
         return canBeFitted && shouldBeFitted ? "fit" : prevScale;
       });

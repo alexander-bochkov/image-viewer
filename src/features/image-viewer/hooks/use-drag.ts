@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import { LEFT_MOUSE_BUTTON } from "shared/constants";
 
 import type { RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
@@ -69,24 +70,28 @@ export const useDrag = ({
   imageRef: RefObject<Nullable<HTMLImageElement>>;
   setOffset: (value: SetStateAction<Offset>) => void;
 }) => {
-  const [draggable, setDraggable] = useState(false);
+  const [isDraggable, setIsDraggable] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
-  useEffect(() => {
-    if (!containerRef.current || !imageRef.current) return;
+  const onDragStart = ({ button }: MouseEvent) => {
+    if (button === LEFT_MOUSE_BUTTON) {
+      setIsDraggable(true);
+    }
+  };
 
-    const containerEl = containerRef.current;
-    const imageEl = imageRef.current;
+  const onDragEnd = () => {
+    setIsDraggable(false);
+    setIsDragging(false);
+  };
 
-    const enableDrag = () => {
-      setDraggable(true);
-    };
+  const onDrag = useCallback(
+    ({ movementX, movementY }: MouseEvent) => {
+      if (!containerRef.current || !imageRef.current || !isDraggable) return;
 
-    const disableDrag = () => {
-      setDraggable(false);
-    };
+      if (!isDragging) setIsDragging(true);
 
-    const handleDrag = ({ movementX, movementY }: MouseEvent) => {
-      if (!draggable) return;
+      const containerEl = containerRef.current;
+      const imageEl = imageRef.current;
 
       const directions = getDirections({
         containerEl,
@@ -128,18 +133,15 @@ export const useDrag = ({
 
         return { x: nextOffsetX, y: nextOffsetY };
       });
-    };
+    },
+    [
+      containerRef.current,
+      imageRef.current,
+      isDraggable,
+      isDragging,
+      setOffset,
+    ],
+  );
 
-    imageEl.addEventListener("mousedown", enableDrag);
-    imageEl.addEventListener("mouseleave", disableDrag);
-    imageEl.addEventListener("mousemove", handleDrag);
-    imageEl.addEventListener("mouseup", disableDrag);
-
-    return () => {
-      imageEl.removeEventListener("mousedown", enableDrag);
-      imageEl.removeEventListener("mouseleave", disableDrag);
-      imageEl.removeEventListener("mousemove", handleDrag);
-      imageEl.removeEventListener("mouseup", disableDrag);
-    };
-  }, [containerRef.current, draggable, imageRef.current, setOffset]);
+  return { isDragging, onDrag, onDragEnd, onDragStart };
 };

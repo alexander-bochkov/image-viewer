@@ -1,3 +1,2 @@
-export * from "./use-drag";
+export * from "./use-control";
 export * from "./use-resize";
-export * from "./use-zoom";

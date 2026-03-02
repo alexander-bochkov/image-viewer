@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
+import { LEFT_MOUSE_BUTTON } from "shared/constants";
 
 const DEFAULT_TOTAL_MOVEMENT = { x: 0, y: 0 };
-const LEFT_MOUSE_BUTTON = 0;
 const MOVEMENT_THRESHOLD = 3;
 const OPENING_DELAY = 300;
 
