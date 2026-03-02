@@ -2,9 +2,17 @@ import { useEffect, useState } from "react";
 
 import type { RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
-import type { Position } from "../types";
+import type { Offset } from "../types";
 
 type Direction = "down" | "left" | "right" | "up";
+
+const addReserveToRectCoords = (rect: DOMRect): DOMRect => ({
+  ...rect,
+  bottom: rect.bottom + 1,
+  left: rect.left - 1,
+  right: rect.right + 1,
+  top: rect.top - 1,
+});
 
 const getDirections = ({
   containerEl,
@@ -19,7 +27,7 @@ const getDirections = ({
 }) => {
   const directions: Direction[] = [];
 
-  const container = containerEl.getBoundingClientRect();
+  const container = addReserveToRectCoords(containerEl.getBoundingClientRect());
   const image = imageEl.getBoundingClientRect();
 
   if (movementX < 0 && image.right > container.right) directions.push("left");
@@ -40,26 +48,26 @@ const getMaxOffset = ({
   imageEl: HTMLImageElement;
   offsetX: number;
   offsetY: number;
-}): Record<Direction, number> => {
-  const container = containerEl.getBoundingClientRect();
+}) => {
+  const container = addReserveToRectCoords(containerEl.getBoundingClientRect());
   const image = imageEl.getBoundingClientRect();
 
   return {
-    down: container.top - image.top + offsetY,
+    bottom: container.top - image.top + offsetY,
     left: container.right - image.right + offsetX,
     right: container.left - image.left + offsetX,
-    up: container.bottom - image.bottom + offsetY,
+    top: container.bottom - image.bottom + offsetY,
   };
 };
 
 export const useDrag = ({
   containerRef,
   imageRef,
-  setPosition,
+  setOffset,
 }: {
   containerRef: RefObject<Nullable<HTMLDivElement>>;
   imageRef: RefObject<Nullable<HTMLImageElement>>;
-  setPosition: (value: SetStateAction<Position>) => void;
+  setOffset: (value: SetStateAction<Offset>) => void;
 }) => {
   const [draggable, setDraggable] = useState(false);
 
@@ -89,8 +97,8 @@ export const useDrag = ({
 
       if (!directions.length) return;
 
-      setPosition((prevPosition) => {
-        const { x: offsetX, y: offsetY } = prevPosition;
+      setOffset((prevOffset) => {
+        const { x: offsetX, y: offsetY } = prevOffset;
 
         const maxOffset = getMaxOffset({
           containerEl,
@@ -111,11 +119,11 @@ export const useDrag = ({
         }
 
         if (directions.includes("up")) {
-          nextOffsetY = Math.max(offsetY + movementY, maxOffset.up);
+          nextOffsetY = Math.max(offsetY + movementY, maxOffset.top);
         }
 
         if (directions.includes("down")) {
-          nextOffsetY = Math.min(offsetY + movementY, maxOffset.down);
+          nextOffsetY = Math.min(offsetY + movementY, maxOffset.bottom);
         }
 
         return { x: nextOffsetX, y: nextOffsetY };
@@ -133,5 +141,5 @@ export const useDrag = ({
       imageEl.removeEventListener("mousemove", handleDrag);
       imageEl.removeEventListener("mouseup", disableDrag);
     };
-  }, [containerRef.current, draggable, imageRef.current, setPosition]);
+  }, [containerRef.current, draggable, imageRef.current, setOffset]);
 };

@@ -1,18 +1,18 @@
 import clsx from "clsx";
 
 import type { Ref } from "react";
-import type { Position, Scale } from "../../types";
+import type { Offset, Scale } from "../../types";
 
 import styles from "./image.module.css";
 
 type ImageProps = {
-  position?: Position;
+  offset?: Offset;
   ref?: Ref<HTMLImageElement>;
   scale?: Scale;
   src: string;
 };
 
-export const Image = ({ position, ref, scale = "fit", src }: ImageProps) => (
+export const Image = ({ offset, ref, scale = "fit", src }: ImageProps) => (
   <img
     alt=""
     className={clsx(styles.image, { [styles.fit]: scale === "fit" })}
@@ -21,7 +21,7 @@ export const Image = ({ position, ref, scale = "fit", src }: ImageProps) => (
     src={src}
     style={{
       scale: scale !== "fit" ? scale : undefined,
-      translate: position ? `${position.x}px ${position.y}px` : undefined,
+      translate: offset ? `${offset.x}px ${offset.y}px` : undefined,
     }}
   />
 );

@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { DEFAULT_POSITION, FULL_SIZE_SCALE } from "../constants";
+import { DEFAULT_OFFSET, FULL_SIZE_SCALE } from "../constants";
 import { calculateImageScaleInContainer } from "../utils";
 
 import type { RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
-import type { Position, Scale } from "../types";
+import type { Offset, Scale } from "../types";
 
 const MAX_SCALE = 4;
 const SCALE_STEP = 0.3;
@@ -12,12 +12,12 @@ const SCALE_STEP = 0.3;
 export const useZoom = ({
   containerRef,
   imageRef,
-  setPosition,
+  setOffset,
   setScale,
 }: {
   containerRef: RefObject<Nullable<HTMLDivElement>>;
   imageRef: RefObject<Nullable<HTMLImageElement>>;
-  setPosition: (value: SetStateAction<Position>) => void;
+  setOffset: (value: SetStateAction<Offset>) => void;
   setScale: (value: SetStateAction<Scale>) => void;
 }) => {
   useEffect(() => {
@@ -29,7 +29,7 @@ export const useZoom = ({
     const handleDoubleClick = () => {
       setScale((prevScale) => {
         if (prevScale !== "fit") {
-          setPosition(DEFAULT_POSITION);
+          setOffset(DEFAULT_OFFSET);
           return "fit";
         }
 
@@ -66,5 +66,5 @@ export const useZoom = ({
       imageEl.removeEventListener("dblclick", handleDoubleClick);
       document.removeEventListener("wheel", handleWheel);
     };
-  }, [containerRef.current, imageRef.current, setPosition, setScale]);
+  }, [containerRef.current, imageRef.current, setOffset, setScale]);
 };
