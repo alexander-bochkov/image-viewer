@@ -35,8 +35,8 @@ export const useControl = ({
 
     const imageEl = imageRef.current;
 
-    const handleClick = () => {
-      !isDragging && onFullSizeZoom();
+    const handleClick = (event: PointerEvent) => {
+      !isDragging && onFullSizeZoom(event);
       onDragEnd();
     };
 

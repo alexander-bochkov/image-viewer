@@ -1,19 +1,12 @@
 import { useCallback, useState } from "react";
 import { LEFT_MOUSE_BUTTON } from "shared/constants";
+import { getBoundingClientRectWithReserve } from "../utils";
 
 import type { RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
 import type { Offset } from "../types";
 
 type Direction = "down" | "left" | "right" | "up";
-
-const addReserveToRectCoords = (rect: DOMRect): DOMRect => ({
-  ...rect,
-  bottom: rect.bottom + 1,
-  left: rect.left - 1,
-  right: rect.right + 1,
-  top: rect.top - 1,
-});
 
 const getDirections = ({
   containerEl,
@@ -28,7 +21,7 @@ const getDirections = ({
 }) => {
   const directions: Direction[] = [];
 
-  const container = addReserveToRectCoords(containerEl.getBoundingClientRect());
+  const container = getBoundingClientRectWithReserve(containerEl);
   const image = imageEl.getBoundingClientRect();
 
   if (movementX < 0 && image.right > container.right) directions.push("left");
@@ -50,7 +43,7 @@ const getMaxOffset = ({
   offsetX: number;
   offsetY: number;
 }) => {
-  const container = addReserveToRectCoords(containerEl.getBoundingClientRect());
+  const container = getBoundingClientRectWithReserve(containerEl);
   const image = imageEl.getBoundingClientRect();
 
   return {
