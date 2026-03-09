@@ -166,6 +166,8 @@ export const useZoom = ({
         }
 
         if (zoom === "in") {
+          if (prevScale === MAX_SCALE) return prevScale;
+
           const nextScale = Math.min(prevScale + SCALE_STEP, MAX_SCALE);
 
           setOffset(
