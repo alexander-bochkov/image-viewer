@@ -1,28 +1,22 @@
 import { useCallback, useState } from "react";
 import { LEFT_MOUSE_BUTTON } from "shared/constants";
-import { getBoundingClientRectWithReserve } from "../utils";
 
 import type { RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
 import type { Offset } from "../types";
 
-type Direction = "down" | "left" | "right" | "up";
-
 const getDirections = ({
-  containerEl,
-  imageEl,
+  container,
+  image,
   movementX,
   movementY,
 }: {
-  containerEl: HTMLElement;
-  imageEl: HTMLImageElement;
+  container: DOMRect;
+  image: DOMRect;
   movementX: number;
   movementY: number;
 }) => {
-  const directions: Direction[] = [];
-
-  const container = getBoundingClientRectWithReserve(containerEl);
-  const image = imageEl.getBoundingClientRect();
+  const directions = [];
 
   if (movementX < 0 && image.right > container.right) directions.push("left");
   if (movementX > 0 && image.left < container.left) directions.push("right");
@@ -33,26 +27,21 @@ const getDirections = ({
 };
 
 const getMaxOffset = ({
-  containerEl,
-  imageEl,
+  container,
+  image,
   offsetX,
   offsetY,
 }: {
-  containerEl: HTMLElement;
-  imageEl: HTMLImageElement;
+  container: DOMRect;
+  image: DOMRect;
   offsetX: number;
   offsetY: number;
-}) => {
-  const container = getBoundingClientRectWithReserve(containerEl);
-  const image = imageEl.getBoundingClientRect();
-
-  return {
-    bottom: container.top - image.top + offsetY,
-    left: container.right - image.right + offsetX,
-    right: container.left - image.left + offsetX,
-    top: container.bottom - image.bottom + offsetY,
-  };
-};
+}) => ({
+  bottom: Math.floor(container.top - image.top + offsetY),
+  left: Math.floor(container.right - image.right + offsetX),
+  right: Math.floor(container.left - image.left + offsetX),
+  top: Math.floor(container.bottom - image.bottom + offsetY),
+});
 
 export const useDrag = ({
   containerRef,
@@ -66,65 +55,58 @@ export const useDrag = ({
   const [isDraggable, setIsDraggable] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  const onDragStart = ({ button }: MouseEvent) => {
-    if (button === LEFT_MOUSE_BUTTON) {
-      setIsDraggable(true);
-    }
-  };
+  const onDragStart = useCallback(({ button }: MouseEvent) => {
+    if (button === LEFT_MOUSE_BUTTON) setIsDraggable(true);
+  }, []);
 
-  const onDragEnd = () => {
+  const onDragEnd = useCallback(() => {
     setIsDraggable(false);
     setIsDragging(false);
-  };
+  }, []);
 
   const onDrag = useCallback(
     ({ movementX, movementY }: MouseEvent) => {
       if (!containerRef.current || !imageRef.current || !isDraggable) return;
 
-      if (!isDragging) setIsDragging(true);
+      !isDragging && setIsDragging(true);
 
-      const containerEl = containerRef.current;
-      const imageEl = imageRef.current;
+      const container = containerRef.current.getBoundingClientRect();
+      const image = imageRef.current.getBoundingClientRect();
 
       const directions = getDirections({
-        containerEl,
-        imageEl,
+        container,
+        image,
         movementX,
         movementY,
       });
 
       if (!directions.length) return;
 
-      setOffset((prevOffset) => {
-        const { x: offsetX, y: offsetY } = prevOffset;
-
+      setOffset(({ x, y }) => {
         const maxOffset = getMaxOffset({
-          containerEl,
-          imageEl,
-          offsetX,
-          offsetY,
+          container,
+          image,
+          offsetX: x,
+          offsetY: y,
         });
 
-        let nextOffsetX = offsetX;
-        let nextOffsetY = offsetY;
-
         if (directions.includes("left")) {
-          nextOffsetX = Math.max(offsetX + movementX, maxOffset.left);
+          x = Math.max(x + movementX, maxOffset.left);
         }
 
         if (directions.includes("right")) {
-          nextOffsetX = Math.min(offsetX + movementX, maxOffset.right);
+          x = Math.min(x + movementX, maxOffset.right);
         }
 
         if (directions.includes("up")) {
-          nextOffsetY = Math.max(offsetY + movementY, maxOffset.top);
+          y = Math.max(y + movementY, maxOffset.top);
         }
 
         if (directions.includes("down")) {
-          nextOffsetY = Math.min(offsetY + movementY, maxOffset.bottom);
+          y = Math.min(y + movementY, maxOffset.bottom);
         }
 
-        return { x: nextOffsetX, y: nextOffsetY };
+        return { x, y };
       });
     },
     [
