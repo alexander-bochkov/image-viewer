@@ -1,80 +1,82 @@
 import { useCallback } from "react";
 import { DEFAULT_OFFSET, FULL_SIZE_SCALE } from "../constants";
-import {
-  getBoundingClientRectWithReserve,
-  getImageNaturalScale,
-} from "../utils";
+import { getBoundingClientRectWithReserve } from "../utils";
 
-import type { RefObject, SetStateAction } from "react";
+import type { Dispatch, RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
 import type { Offset, Scale } from "../types";
 
 const MAX_SCALE = 4;
-const SCALE_STEP = 0.2;
 
-const getNextOffset = ({
+const getImageNaturalScale = ({
+  containerEl,
+  imageEl,
+}: {
+  containerEl: HTMLElement;
+  imageEl: HTMLImageElement;
+}) => {
+  const { height, width } = containerEl.getBoundingClientRect();
+  const { naturalHeight, naturalWidth } = imageEl;
+
+  const naturalScaleToHeight = height / naturalHeight;
+  const naturalScaleToWidth = width / naturalWidth;
+
+  return Math.min(naturalScaleToHeight, naturalScaleToWidth);
+};
+
+const getOffset = ({
   clientX,
   clientY,
   containerEl,
   imageEl,
-  nextScale,
+  prevScale,
   scale,
 }: {
   clientX: number;
   clientY: number;
   containerEl: HTMLElement;
   imageEl: HTMLImageElement;
-  nextScale: number;
-  scale: number;
-}): Offset => {
-  let x = DEFAULT_OFFSET.x;
-  let y = DEFAULT_OFFSET.y;
+  prevScale: Exclude<Scale, "fit">;
+  scale: Exclude<Scale, "fit">;
+}) => {
+  let { x, y } = DEFAULT_OFFSET;
 
-  const container = getBoundingClientRectWithReserve(containerEl);
-  const image = imageEl.getBoundingClientRect();
-
+  const { height, width } = getBoundingClientRectWithReserve(containerEl);
   const { naturalHeight, naturalWidth } = imageEl;
 
-  const sizeDiffX = container.width - naturalWidth * nextScale;
-  const sizeDiffY = container.height - naturalHeight * nextScale;
+  const diffX = width - naturalWidth * scale;
+  const diffY = height - naturalHeight * scale;
 
-  const willHeightFit = sizeDiffY >= 0;
-  const willWidthFit = sizeDiffX >= 0;
+  if (diffX < 0) {
+    const { width } = containerEl.getBoundingClientRect();
+    const { left } = imageEl.getBoundingClientRect();
 
-  if (!willHeightFit) {
-    const containerPointerOffsetY = container.height / 2 - clientY;
+    const imageX = (clientX - Math.floor(left)) / prevScale;
+    const imageOffsetX = naturalWidth / 2 - imageX;
 
-    const imagePointerY = (clientY - image.top) / scale;
-    const imagePointerOffsetY = naturalHeight / 2 - imagePointerY;
+    const containerOffsetX = width / 2 - clientX;
 
-    const nextOffsetY =
-      imagePointerOffsetY * nextScale - containerPointerOffsetY;
+    const offsetX = Math.round(imageOffsetX * scale - containerOffsetX);
 
-    const maxOffsetY = Math.abs(sizeDiffY / 2);
+    const maxOffsetX = Math.floor(Math.abs(diffX / 2));
 
-    if (Math.abs(nextOffsetY) < maxOffsetY) {
-      y = nextOffsetY;
-    } else {
-      y = Math.sign(nextOffsetY) === 1 ? maxOffsetY : -maxOffsetY;
-    }
+    x = Math.max(Math.min(offsetX, maxOffsetX), -maxOffsetX);
   }
 
-  if (!willWidthFit) {
-    const containerPointerOffsetX = container.width / 2 - clientX;
+  if (diffY < 0) {
+    const { height } = containerEl.getBoundingClientRect();
+    const { top } = imageEl.getBoundingClientRect();
 
-    const imagePointerX = (clientX - image.left) / scale;
-    const imagePointerOffsetX = naturalWidth / 2 - imagePointerX;
+    const imageY = (clientY - Math.floor(top)) / prevScale;
+    const imageOffsetY = naturalHeight / 2 - imageY;
 
-    const nextOffsetX =
-      imagePointerOffsetX * nextScale - containerPointerOffsetX;
+    const containerOffsetY = height / 2 - clientY;
 
-    const maxOffsetX = Math.abs(sizeDiffX / 2);
+    const offsetY = Math.round(imageOffsetY * scale - containerOffsetY);
 
-    if (Math.abs(nextOffsetX) < maxOffsetX) {
-      x = nextOffsetX;
-    } else {
-      x = Math.sign(nextOffsetX) === 1 ? maxOffsetX : -maxOffsetX;
-    }
+    const maxOffsetY = Math.floor(Math.abs(diffY / 2));
+
+    y = Math.max(Math.min(offsetY, maxOffsetY), -maxOffsetY);
   }
 
   return { x, y };
@@ -88,8 +90,8 @@ export const useZoom = ({
 }: {
   containerRef: RefObject<Nullable<HTMLDivElement>>;
   imageRef: RefObject<Nullable<HTMLImageElement>>;
-  setOffset: (value: SetStateAction<Offset>) => void;
-  setScale: (value: SetStateAction<Scale>) => void;
+  setOffset: Dispatch<SetStateAction<Offset>>;
+  setScale: Dispatch<SetStateAction<Scale>>;
 }) => {
   const onFullSizeZoom = useCallback(
     ({ clientX, clientY }: PointerEvent) => {
@@ -102,26 +104,26 @@ export const useZoom = ({
       const fitScale = Math.min(naturalScale, FULL_SIZE_SCALE);
 
       setScale((prevScale) => {
-        if (
-          prevScale !== "fit" &&
-          (prevScale <= FULL_SIZE_SCALE || fitScale === FULL_SIZE_SCALE)
-        ) {
+        if (prevScale === "fit" && fitScale === FULL_SIZE_SCALE) {
+          return prevScale;
+        }
+
+        if (prevScale !== "fit" && prevScale <= FULL_SIZE_SCALE) {
           setOffset(DEFAULT_OFFSET);
           return "fit";
         }
 
-        const scale = prevScale === "fit" ? fitScale : prevScale;
-
         setOffset(
-          getNextOffset({
+          getOffset({
             clientX,
             clientY,
             containerEl,
             imageEl,
-            nextScale: FULL_SIZE_SCALE,
-            scale,
+            prevScale: prevScale === "fit" ? fitScale : prevScale,
+            scale: FULL_SIZE_SCALE,
           }),
         );
+
         return FULL_SIZE_SCALE;
       });
     },
@@ -132,77 +134,57 @@ export const useZoom = ({
     ({ clientX, clientY, deltaY }: WheelEvent) => {
       if (!containerRef.current || !imageRef.current) return;
 
+      const step = deltaY * 0.001;
+
       const containerEl = containerRef.current;
       const imageEl = imageRef.current;
 
-      const zoom = deltaY < 0 ? "in" : "out";
+      const naturalScale = getImageNaturalScale({ containerEl, imageEl });
+      const fitScale = Math.min(naturalScale, FULL_SIZE_SCALE);
 
       setScale((prevScale) => {
-        const naturalScale = getImageNaturalScale({
-          containerEl,
-          imageEl,
-        });
-        const fitScale = Math.min(naturalScale, FULL_SIZE_SCALE);
+        const rawScale = (prevScale === "fit" ? fitScale : prevScale) - step;
+        const scale = parseFloat(rawScale.toFixed(1));
 
-        if (prevScale === "fit") {
-          if (zoom === "in") {
-            const nextScale = fitScale + SCALE_STEP;
-
-            setOffset(
-              getNextOffset({
-                clientX,
-                clientY,
-                containerEl,
-                imageEl,
-                nextScale,
-                scale: fitScale,
-              }),
-            );
-
-            return nextScale;
-          } else {
-            return prevScale;
-          }
+        if (
+          (prevScale === "fit" && scale <= fitScale) ||
+          (prevScale === MAX_SCALE && scale >= MAX_SCALE)
+        ) {
+          return prevScale;
         }
 
-        if (zoom === "in") {
-          if (prevScale === MAX_SCALE) return prevScale;
-
-          const nextScale = Math.min(prevScale + SCALE_STEP, MAX_SCALE);
-
-          setOffset(
-            getNextOffset({
-              clientX,
-              clientY,
-              containerEl,
-              imageEl,
-              nextScale,
-              scale: prevScale,
-            }),
-          );
-
-          return nextScale;
-        }
-
-        const nextScale = prevScale - SCALE_STEP;
-
-        if (nextScale > fitScale) {
-          setOffset(
-            getNextOffset({
-              clientX,
-              clientY,
-              containerEl,
-              imageEl,
-              nextScale,
-              scale: prevScale,
-            }),
-          );
-
-          return nextScale;
-        } else {
+        if (scale <= fitScale) {
           setOffset(DEFAULT_OFFSET);
           return "fit";
         }
+
+        if (scale >= MAX_SCALE) {
+          setOffset(
+            getOffset({
+              clientX,
+              clientY,
+              containerEl,
+              imageEl,
+              prevScale: prevScale === "fit" ? fitScale : prevScale,
+              scale: MAX_SCALE,
+            }),
+          );
+
+          return MAX_SCALE;
+        }
+
+        setOffset(
+          getOffset({
+            clientX,
+            clientY,
+            containerEl,
+            imageEl,
+            prevScale: prevScale === "fit" ? fitScale : prevScale,
+            scale,
+          }),
+        );
+
+        return scale;
       });
     },
     [containerRef.current, imageRef.current, setOffset, setScale],

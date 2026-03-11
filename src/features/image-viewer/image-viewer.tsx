@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Container } from "./components/Container";
 import { Image } from "./components/Image";
 import { DEFAULT_OFFSET } from "./constants";
-import { useControl, useResize } from "./hooks";
+import { useControls, useResize } from "./hooks";
 
 import type { Offset, Scale } from "./types";
 
@@ -17,8 +17,8 @@ const ImageViewer = ({ src }: ImageViewerProps) => {
   const [offset, setOffset] = useState<Offset>(DEFAULT_OFFSET);
   const [scale, setScale] = useState<Scale>("fit");
 
-  useControl({ containerRef, imageRef, setOffset, setScale });
-  useResize({ containerRef, imageRef, setScale });
+  useControls({ containerRef, imageRef, setOffset, setScale });
+  useResize({ setOffset, setScale });
 
   return (
     <Container ref={containerRef}>

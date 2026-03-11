@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { useDrag } from "./use-drag";
 import { useZoom } from "./use-zoom";
 
-import type { RefObject, SetStateAction } from "react";
+import type { Dispatch, RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
 import type { Offset, Scale } from "../types";
 
-export const useControl = ({
+export const useControls = ({
   containerRef,
   imageRef,
   setOffset,
@@ -14,8 +14,8 @@ export const useControl = ({
 }: {
   containerRef: RefObject<Nullable<HTMLDivElement>>;
   imageRef: RefObject<Nullable<HTMLImageElement>>;
-  setOffset: (value: SetStateAction<Offset>) => void;
-  setScale: (value: SetStateAction<Scale>) => void;
+  setOffset: Dispatch<SetStateAction<Offset>>;
+  setScale: Dispatch<SetStateAction<Scale>>;
 }) => {
   const { isDragging, onDrag, onDragEnd, onDragStart } = useDrag({
     containerRef,

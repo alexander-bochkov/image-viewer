@@ -1,40 +1,20 @@
 import { useEffect } from "react";
-import { FULL_SIZE_SCALE } from "../constants";
-import { getImageNaturalScale } from "../utils";
+import { DEFAULT_OFFSET } from "../constants";
 
-import type { RefObject, SetStateAction } from "react";
-import type { Nullable } from "shared/types";
-import type { Scale } from "../types";
+import type { Dispatch, SetStateAction } from "react";
+import type { Offset, Scale } from "../types";
 
 export const useResize = ({
-  containerRef,
-  imageRef,
+  setOffset,
   setScale,
 }: {
-  containerRef: RefObject<Nullable<HTMLDivElement>>;
-  imageRef: RefObject<Nullable<HTMLImageElement>>;
-  setScale: (value: SetStateAction<Scale>) => void;
+  setOffset: Dispatch<SetStateAction<Offset>>;
+  setScale: Dispatch<SetStateAction<Scale>>;
 }) => {
   useEffect(() => {
-    if (!containerRef.current || !imageRef.current) return;
-
-    const containerEl = containerRef.current;
-    const imageEl = imageRef.current;
-
     const handleResize = () => {
-      setScale((prevScale) => {
-        if (prevScale === "fit") return prevScale;
-
-        const imageNaturalScale = getImageNaturalScale({
-          containerEl,
-          imageEl,
-        });
-
-        const canBeFitted = prevScale <= FULL_SIZE_SCALE;
-        const shouldBeFitted = prevScale < imageNaturalScale;
-
-        return canBeFitted && shouldBeFitted ? "fit" : prevScale;
-      });
+      setOffset(DEFAULT_OFFSET);
+      setScale("fit");
     };
 
     window.addEventListener("resize", handleResize);
@@ -42,5 +22,5 @@ export const useResize = ({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [containerRef.current, imageRef.current, setScale]);
+  }, [setOffset, setScale]);
 };

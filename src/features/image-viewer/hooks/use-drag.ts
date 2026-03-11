@@ -1,7 +1,8 @@
 import { useCallback, useState } from "react";
 import { LEFT_MOUSE_BUTTON } from "shared/constants";
+import { getBoundingClientRectWithReserve } from "../utils";
 
-import type { RefObject, SetStateAction } from "react";
+import type { Dispatch, RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
 import type { Offset } from "../types";
 
@@ -50,7 +51,7 @@ export const useDrag = ({
 }: {
   containerRef: RefObject<Nullable<HTMLDivElement>>;
   imageRef: RefObject<Nullable<HTMLImageElement>>;
-  setOffset: (value: SetStateAction<Offset>) => void;
+  setOffset: Dispatch<SetStateAction<Offset>>;
 }) => {
   const [isDraggable, setIsDraggable] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -70,7 +71,7 @@ export const useDrag = ({
 
       !isDragging && setIsDragging(true);
 
-      const container = containerRef.current.getBoundingClientRect();
+      const container = getBoundingClientRectWithReserve(containerRef.current);
       const image = imageRef.current.getBoundingClientRect();
 
       const directions = getDirections({
