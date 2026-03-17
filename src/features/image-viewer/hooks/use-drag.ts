@@ -1,56 +1,22 @@
 import { useCallback, useState } from "react";
 import { LEFT_MOUSE_BUTTON } from "shared/constants";
-import { getBoundingClientRectWithReserve } from "../utils";
+import { getMaxOffset } from "../utils";
 
 import type { Dispatch, RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
 import type { Offset } from "../types";
 
-const getDirections = ({
-  container,
-  image,
-  movementX,
-  movementY,
-}: {
-  container: DOMRect;
-  image: DOMRect;
-  movementX: number;
-  movementY: number;
-}) => {
-  const directions = [];
-
-  if (movementX < 0 && image.right > container.right) directions.push("left");
-  if (movementX > 0 && image.left < container.left) directions.push("right");
-  if (movementY < 0 && image.bottom > container.bottom) directions.push("up");
-  if (movementY > 0 && image.top < container.top) directions.push("down");
-
-  return directions;
-};
-
-const getMaxOffset = ({
-  container,
-  image,
-  offsetX,
-  offsetY,
-}: {
-  container: DOMRect;
-  image: DOMRect;
-  offsetX: number;
-  offsetY: number;
-}) => ({
-  bottom: Math.floor(container.top - image.top + offsetY),
-  left: Math.floor(container.right - image.right + offsetX),
-  right: Math.floor(container.left - image.left + offsetX),
-  top: Math.floor(container.bottom - image.bottom + offsetY),
-});
-
 export const useDrag = ({
   containerRef,
   imageRef,
+  offset,
+  scale,
   setOffset,
 }: {
   containerRef: RefObject<Nullable<HTMLDivElement>>;
   imageRef: RefObject<Nullable<HTMLImageElement>>;
+  offset: Offset;
+  scale: number;
   setOffset: Dispatch<SetStateAction<Offset>>;
 }) => {
   const [isDraggable, setIsDraggable] = useState(false);
@@ -71,50 +37,27 @@ export const useDrag = ({
 
       !isDragging && setIsDragging(true);
 
-      const container = getBoundingClientRectWithReserve(containerRef.current);
-      const image = imageRef.current.getBoundingClientRect();
+      const offsetX = offset.x + movementX;
+      const offsetY = offset.y + movementY;
 
-      const directions = getDirections({
-        container,
-        image,
-        movementX,
-        movementY,
+      const maxOffset = getMaxOffset({
+        containerEl: containerRef.current,
+        imageEl: imageRef.current,
+        scale,
       });
 
-      if (!directions.length) return;
+      const nextX = Math.min(Math.max(-maxOffset.x, offsetX), maxOffset.x);
+      const nextY = Math.min(Math.max(-maxOffset.y, offsetY), maxOffset.y);
 
-      setOffset(({ x, y }) => {
-        const maxOffset = getMaxOffset({
-          container,
-          image,
-          offsetX: x,
-          offsetY: y,
-        });
-
-        if (directions.includes("left")) {
-          x = Math.max(x + movementX, maxOffset.left);
-        }
-
-        if (directions.includes("right")) {
-          x = Math.min(x + movementX, maxOffset.right);
-        }
-
-        if (directions.includes("up")) {
-          y = Math.max(y + movementY, maxOffset.top);
-        }
-
-        if (directions.includes("down")) {
-          y = Math.min(y + movementY, maxOffset.bottom);
-        }
-
-        return { x, y };
-      });
+      setOffset({ x: nextX, y: nextY });
     },
     [
       containerRef.current,
       imageRef.current,
       isDraggable,
       isDragging,
+      offset,
+      scale,
       setOffset,
     ],
   );

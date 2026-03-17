@@ -4,28 +4,39 @@ import { useZoom } from "./use-zoom";
 
 import type { Dispatch, RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
-import type { Offset, Scale } from "../types";
+import type { Offset } from "../types";
 
 export const useControls = ({
   containerRef,
+  fitScale,
   imageRef,
+  offset,
+  scale,
   setOffset,
   setScale,
 }: {
   containerRef: RefObject<Nullable<HTMLDivElement>>;
+  fitScale: number;
   imageRef: RefObject<Nullable<HTMLImageElement>>;
+  offset: Offset;
+  scale: number;
   setOffset: Dispatch<SetStateAction<Offset>>;
-  setScale: Dispatch<SetStateAction<Scale>>;
+  setScale: Dispatch<SetStateAction<number>>;
 }) => {
   const { isDragging, onDrag, onDragEnd, onDragStart } = useDrag({
     containerRef,
     imageRef,
+    offset,
+    scale,
     setOffset,
   });
 
   const { onFullSizeZoom, onZoom } = useZoom({
     containerRef,
+    fitScale,
     imageRef,
+    offset,
+    scale,
     setOffset,
     setScale,
   });

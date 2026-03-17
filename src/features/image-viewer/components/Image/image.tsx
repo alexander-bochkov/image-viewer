@@ -1,27 +1,33 @@
-import clsx from "clsx";
+import { motion } from "motion/react";
 
 import type { Ref } from "react";
-import type { Offset, Scale } from "../../types";
+import type { Offset } from "../../types";
 
 import styles from "./image.module.css";
 
 type ImageProps = {
-  offset?: Offset;
+  fitScale: number;
+  offset: Offset;
   ref?: Ref<HTMLImageElement>;
-  scale?: Scale;
+  scale: number;
   src: string;
 };
 
-export const Image = ({ offset, ref, scale = "fit", src }: ImageProps) => (
-  <img
+export const Image = ({
+  fitScale,
+  offset: { x, y },
+  ref,
+  scale,
+  src,
+}: ImageProps) => (
+  <motion.img
     alt=""
-    className={clsx(styles.image, { [styles.fit]: scale === "fit" })}
+    animate={{ scale, x, y }}
+    className={styles.image}
     draggable={false}
+    initial={{ scale: fitScale }}
     ref={ref}
     src={src}
-    style={{
-      scale: scale !== "fit" ? scale : undefined,
-      translate: offset ? `${offset.x}px ${offset.y}px` : undefined,
-    }}
+    transition={{ duration: 0.15, ease: "easeOut" }}
   />
 );
