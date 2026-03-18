@@ -1,3 +1,4 @@
 .no-scroll {
-  overflow: hidden;
+  /* biome-ignore lint/complexity/noImportantStyles: Force hiding the scroll bar */
+  overflow: hidden !important;
 }
