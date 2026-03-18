@@ -1,6 +1,7 @@
 .loader {
-  display: block;
   width: 60px;
   height: 60px;
+  pointer-events: none;
   fill: white;
+  animation: image-viewer-spin 1s linear infinite;
 }

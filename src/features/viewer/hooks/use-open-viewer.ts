@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { LEFT_MOUSE_BUTTON } from "shared/constants";
+import { PRIMARY_MOUSE_BUTTON } from "shared/constants";
 
 const DEFAULT_TOTAL_MOVEMENT = { x: 0, y: 0 };
 const MOVEMENT_THRESHOLD = 3;
@@ -31,7 +31,10 @@ export const useOpenViewer = ({
     if (!enabled) return;
 
     const init = ({ button, target }: MouseEvent) => {
-      if (button === LEFT_MOUSE_BUTTON && target instanceof HTMLImageElement) {
+      if (
+        button === PRIMARY_MOUSE_BUTTON &&
+        target instanceof HTMLImageElement
+      ) {
         setTimer(() => {
           handler(target);
           reset();
@@ -54,7 +57,7 @@ export const useOpenViewer = ({
     };
 
     const resetOnPointerUp = ({ button }: MouseEvent) => {
-      if (button === LEFT_MOUSE_BUTTON && timerID.current) {
+      if (button === PRIMARY_MOUSE_BUTTON && timerID.current) {
         reset();
       }
     };

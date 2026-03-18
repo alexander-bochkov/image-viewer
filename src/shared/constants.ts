@@ -1,1 +1,1 @@
-export const LEFT_MOUSE_BUTTON = 0;
+export const PRIMARY_MOUSE_BUTTON = 0;

@@ -1,23 +1,21 @@
 import { useEffect } from "react";
 import { DEFAULT_OFFSET } from "../constants";
-import { getImageFitScale } from "../utils";
+import { getFitScale } from "../utils";
 
 import type { Dispatch, RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
-import type { Offset } from "../types";
+import type { View } from "../types";
 
 export const useResize = ({
   containerRef,
+  fitScale,
   imageRef,
-  setFitScale,
-  setOffset,
-  setScale,
+  setView,
 }: {
   containerRef: RefObject<Nullable<HTMLDivElement>>;
+  fitScale: RefObject<number>;
   imageRef: RefObject<Nullable<HTMLImageElement>>;
-  setFitScale: Dispatch<SetStateAction<number>>;
-  setOffset: Dispatch<SetStateAction<Offset>>;
-  setScale: Dispatch<SetStateAction<number>>;
+  setView: Dispatch<SetStateAction<View>>;
 }) => {
   useEffect(() => {
     const handleResize = () => {
@@ -26,12 +24,10 @@ export const useResize = ({
       const containerEl = containerRef.current;
       const imageEl = imageRef.current;
 
-      const fitScale = getImageFitScale(containerEl, imageEl);
+      const nextFitScale = getFitScale(containerEl, imageEl);
 
-      setFitScale(fitScale);
-      setScale(fitScale);
-
-      setOffset(DEFAULT_OFFSET);
+      fitScale.current = nextFitScale;
+      setView({ offset: DEFAULT_OFFSET, scale: nextFitScale });
     };
 
     window.addEventListener("resize", handleResize);
@@ -39,11 +35,5 @@ export const useResize = ({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [
-    containerRef.current,
-    imageRef.current,
-    setFitScale,
-    setOffset,
-    setScale,
-  ]);
+  }, [containerRef, fitScale, imageRef, setView]);
 };

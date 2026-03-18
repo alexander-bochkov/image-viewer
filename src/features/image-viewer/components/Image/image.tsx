@@ -1,33 +1,11 @@
-import { motion } from "motion/react";
-
-import type { Ref } from "react";
-import type { Offset } from "../../types";
+import type { ImgHTMLAttributes, Ref } from "react";
 
 import styles from "./image.module.css";
 
-type ImageProps = {
-  fitScale: number;
-  offset: Offset;
+type ImageProps = ImgHTMLAttributes<HTMLImageElement> & {
   ref?: Ref<HTMLImageElement>;
-  scale: number;
-  src: string;
 };
 
-export const Image = ({
-  fitScale,
-  offset: { x, y },
-  ref,
-  scale,
-  src,
-}: ImageProps) => (
-  <motion.img
-    alt=""
-    animate={{ scale, x, y }}
-    className={styles.image}
-    draggable={false}
-    initial={{ scale: fitScale }}
-    ref={ref}
-    src={src}
-    transition={{ duration: 0.15, ease: "easeOut" }}
-  />
+export const Image = (props: ImageProps) => (
+  <img {...props} className={styles.image} draggable={false} />
 );

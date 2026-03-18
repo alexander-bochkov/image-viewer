@@ -1,66 +1,60 @@
-import { useCallback, useState } from "react";
-import { LEFT_MOUSE_BUTTON } from "shared/constants";
+import { useState } from "react";
+import { PRIMARY_MOUSE_BUTTON } from "shared/constants";
 import { getMaxOffset } from "../utils";
 
-import type { Dispatch, RefObject, SetStateAction } from "react";
+import type { Dispatch, MouseEvent, RefObject, SetStateAction } from "react";
 import type { Nullable } from "shared/types";
-import type { Offset } from "../types";
+import type { View } from "../types";
 
 export const useDrag = ({
   containerRef,
   imageRef,
-  offset,
-  scale,
-  setOffset,
+  setView,
+  view,
 }: {
   containerRef: RefObject<Nullable<HTMLDivElement>>;
   imageRef: RefObject<Nullable<HTMLImageElement>>;
-  offset: Offset;
-  scale: number;
-  setOffset: Dispatch<SetStateAction<Offset>>;
+  setView: Dispatch<SetStateAction<View>>;
+  view: View;
 }) => {
   const [isDraggable, setIsDraggable] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  const onDragStart = useCallback(({ button }: MouseEvent) => {
-    if (button === LEFT_MOUSE_BUTTON) setIsDraggable(true);
-  }, []);
+  const onDragStart = ({ button }: MouseEvent<HTMLImageElement>) => {
+    if (button === PRIMARY_MOUSE_BUTTON) setIsDraggable(true);
+  };
 
-  const onDragEnd = useCallback(() => {
+  const onDragEnd = () => {
     setIsDraggable(false);
     setIsDragging(false);
-  }, []);
+  };
 
-  const onDrag = useCallback(
-    ({ movementX, movementY }: MouseEvent) => {
-      if (!containerRef.current || !imageRef.current || !isDraggable) return;
+  const onDrag = ({ movementX, movementY }: MouseEvent<HTMLImageElement>) => {
+    if (!containerRef.current || !imageRef.current || !isDraggable) return;
 
-      !isDragging && setIsDragging(true);
+    !isDragging && setIsDragging(true);
 
-      const offsetX = offset.x + movementX;
-      const offsetY = offset.y + movementY;
+    const containerEl = containerRef.current;
+    const imageEl = imageRef.current;
 
-      const maxOffset = getMaxOffset({
-        containerEl: containerRef.current,
-        imageEl: imageRef.current,
-        scale,
-      });
-
-      const nextX = Math.min(Math.max(-maxOffset.x, offsetX), maxOffset.x);
-      const nextY = Math.min(Math.max(-maxOffset.y, offsetY), maxOffset.y);
-
-      setOffset({ x: nextX, y: nextY });
-    },
-    [
-      containerRef.current,
-      imageRef.current,
-      isDraggable,
-      isDragging,
-      offset,
+    const {
+      offset: { x, y },
       scale,
-      setOffset,
-    ],
-  );
+    } = view;
+
+    const { x: maxX, y: maxY } = getMaxOffset(containerEl, imageEl, scale);
+
+    const offsetX = x + movementX;
+    const offsetY = y + movementY;
+
+    setView((prevView) => ({
+      ...prevView,
+      offset: {
+        x: Math.min(Math.max(-maxX, offsetX), maxX),
+        y: Math.min(Math.max(-maxY, offsetY), maxY),
+      },
+    }));
+  };
 
   return { isDragging, onDrag, onDragEnd, onDragStart };
 };

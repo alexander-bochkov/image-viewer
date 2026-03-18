@@ -1,13 +1,15 @@
-import { useRef, useState } from "react";
+import { Activity, useRef, useState } from "react";
 import { Container } from "./components/Container";
 import { Image } from "./components/Image";
 import { Loader } from "./components/Loader";
 import { DEFAULT_OFFSET } from "./constants";
-import { useControls, useInit, useResize } from "./hooks";
+import { useDrag, useResize, useZoom } from "./hooks";
+import { getFitScale } from "./utils";
 
-import type { Offset } from "./types";
+import type { MouseEvent, SyntheticEvent } from "react";
+import type { View } from "./types";
 
-const INITIAL_SCALE = 0;
+const INITIAL_FIT_SCALE = 0;
 
 type ImageViewerProps = {
   src: string;
@@ -17,36 +19,62 @@ const ImageViewer = ({ src }: ImageViewerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
-  const [fitScale, setFitScale] = useState(INITIAL_SCALE);
-  const [scale, setScale] = useState(INITIAL_SCALE);
+  const fitScale = useRef(INITIAL_FIT_SCALE);
 
-  const [offset, setOffset] = useState<Offset>(DEFAULT_OFFSET);
+  const [view, setView] = useState<View>({
+    offset: DEFAULT_OFFSET,
+    scale: fitScale.current,
+  });
 
-  useInit({ containerRef, setFitScale, setScale, src });
-  useResize({ containerRef, imageRef, setFitScale, setOffset, setScale });
-  useControls({
+  useResize({ containerRef, fitScale, imageRef, setView });
+
+  const { isDragging, onDrag, onDragEnd, onDragStart } = useDrag({
+    containerRef,
+    imageRef,
+    setView,
+    view,
+  });
+
+  const { onFullSizeZoom } = useZoom({
     containerRef,
     fitScale,
     imageRef,
-    offset,
-    scale,
-    setOffset,
-    setScale,
+    setView,
+    view,
   });
+
+  const handleClick = (event: MouseEvent<HTMLImageElement>) => {
+    !isDragging && onFullSizeZoom(event);
+    onDragEnd();
+  };
+
+  const handleLoad = ({ currentTarget }: SyntheticEvent<HTMLImageElement>) => {
+    if (!containerRef.current) return;
+
+    const nextFitScale = getFitScale(containerRef.current, currentTarget);
+
+    fitScale.current = nextFitScale;
+    setView((prevView) => ({ ...prevView, scale: nextFitScale }));
+  };
 
   return (
     <Container ref={containerRef}>
-      {fitScale && scale ? (
+      {!view.scale && <Loader />}
+      <Activity mode={view.scale ? "visible" : "hidden"}>
         <Image
-          fitScale={fitScale}
-          offset={offset}
+          onClick={handleClick}
+          onLoad={handleLoad}
+          onMouseDown={onDragStart}
+          onMouseLeave={onDragEnd}
+          onMouseMove={onDrag}
           ref={imageRef}
-          scale={scale}
           src={src}
+          style={{
+            scale: view.scale,
+            translate: `${view.offset.x}px ${view.offset.y}px`,
+          }}
         />
-      ) : (
-        <Loader />
-      )}
+      </Activity>
     </Container>
   );
 };

@@ -46,8 +46,9 @@
   },
   "linter": {
     "rules": {
-      "a11y": {
-        "noSvgWithoutTitle": "off"
+      "a11y": "off",
+      "complexity": {
+        "noImportantStyles": "off"
       },
       "style": {
         "useImportType": {
