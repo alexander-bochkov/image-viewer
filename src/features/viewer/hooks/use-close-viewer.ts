@@ -1,19 +1,26 @@
 import { useEffect } from "react";
 
+import type { RefObject } from "react";
+import type { Nullable } from "shared/types";
+
 const ESCAPE_KEY = "Escape";
 
 export const useCloseViewer = ({
   enabled,
   handler,
+  modalWindowRef,
 }: {
   enabled: boolean;
   handler: () => void;
+  modalWindowRef: RefObject<Nullable<HTMLDialogElement>>;
 }) => {
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || !modalWindowRef.current) return;
 
-    const closeOnClick = ({ target }: MouseEvent) => {
-      if (target instanceof HTMLDialogElement) {
+    const modalWindow = modalWindowRef.current;
+
+    const closeOnClick = (event: MouseEvent) => {
+      if (event.target instanceof HTMLDialogElement) {
         handler();
       }
     };
@@ -25,12 +32,12 @@ export const useCloseViewer = ({
       }
     };
 
-    document.addEventListener("click", closeOnClick);
+    modalWindow.addEventListener("click", closeOnClick);
     document.addEventListener("keydown", closeOnEsc, { capture: true });
 
     return () => {
-      document.removeEventListener("click", closeOnClick);
+      modalWindow.removeEventListener("click", closeOnClick);
       document.removeEventListener("keydown", closeOnEsc, { capture: true });
     };
-  }, [enabled, handler]);
+  }, [enabled, handler, modalWindowRef.current]);
 };

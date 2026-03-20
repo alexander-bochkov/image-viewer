@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.8",
+    "@types/chrome": "0.1.38",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.1",

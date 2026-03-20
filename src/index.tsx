@@ -4,10 +4,17 @@ import Viewer from "features/viewer";
 
 import "./global.css";
 
-const rootEl = document.createElement("viewer-root");
-document.body.appendChild(rootEl);
+const root = document.createElement("swiftview-root");
+document.body.appendChild(root);
 
-createRoot(rootEl).render(
+const shadowRoot = root.attachShadow({ mode: "closed" });
+
+const link = document.createElement("link");
+link.rel = "stylesheet";
+link.href = chrome.runtime.getURL("content.css");
+shadowRoot.appendChild(link);
+
+createRoot(shadowRoot).render(
   <StrictMode>
     <Viewer />
   </StrictMode>,

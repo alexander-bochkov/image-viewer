@@ -21,7 +21,11 @@ const Viewer = () => {
   }, []);
 
   useOpenViewer({ enabled: !imageSrc, handler: handleViewerOpen });
-  useCloseViewer({ enabled: !!imageSrc, handler: handleViewerClose });
+  useCloseViewer({
+    enabled: !!imageSrc,
+    handler: handleViewerClose,
+    modalWindowRef,
+  });
 
   useHidePageScrollbar(!!imageSrc);
 
