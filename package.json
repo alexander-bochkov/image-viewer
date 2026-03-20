@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bun build src/index.tsx --outdir dist --watch",
+    "build": "vite build --watch",
     "biome": "biome check"
   },
   "dependencies": {
@@ -14,6 +14,8 @@
     "@biomejs/biome": "2.4.8",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "typescript": "5.9.3"
+    "@vitejs/plugin-react": "6.0.1",
+    "typescript": "5.9.3",
+    "vite": "8.0.1"
   }
 }
