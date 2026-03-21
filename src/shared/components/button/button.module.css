@@ -1,0 +1,75 @@
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: rgb(200 200 200);
+  cursor: pointer;
+  outline: none;
+  background-color: rgb(60 60 60 / 80%);
+  border: none;
+  backdrop-filter: blur(4px);
+  transition:
+    background-color 100ms ease-out,
+    color 100ms ease-out,
+    transform 50ms ease-out;
+
+  &:active {
+    transform: scale(90%);
+  }
+
+  /* Shape */
+  &.round {
+    border-radius: 50%;
+  }
+
+  &.square {
+    border-radius: 8px;
+  }
+
+  /* Size */
+  &.small {
+    width: 30px;
+    height: 30px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &.medium {
+    width: 36px;
+    height: 36px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  /* Variant */
+  &.default {
+    &:hover {
+      color: rgb(60 60 60);
+      background-color: rgb(220 220 220 / 90%);
+    }
+
+    &:active {
+      color: rgb(60 60 60);
+      background-color: rgb(200 200 200 / 90%);
+    }
+  }
+
+  &.accent {
+    &:hover {
+      color: rgb(255 255 255);
+      background-color: rgb(255 120 120 / 90%);
+    }
+
+    &:active {
+      color: rgb(255 255 255);
+      background-color: rgb(255 100 100 / 90%);
+    }
+  }
+}
