@@ -5,7 +5,7 @@ export default defineConfig({
   build: {
     rolldownOptions: {
       input: {
-        content: "src/index.tsx",
+        content: "src/main.tsx",
       },
       output: {
         assetFileNames: "[name][extname]",
