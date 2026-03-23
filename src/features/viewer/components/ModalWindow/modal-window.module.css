@@ -9,6 +9,18 @@
   background-color: rgb(60 60 60 / 80%);
   border: none;
   backdrop-filter: blur(50px);
+  transition:
+    display 100ms ease-out allow-discrete,
+    opacity 100ms ease-out,
+    overlay 100ms ease-out allow-discrete;
+
+  &:not([open]) {
+    opacity: 0;
+  }
+
+  @starting-style {
+    opacity: 0;
+  }
 
   &::backdrop {
     display: none;
