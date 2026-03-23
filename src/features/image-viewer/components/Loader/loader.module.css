@@ -1,12 +1,12 @@
 .loader {
-  width: 60px;
-  height: 60px;
+  width: 40px;
+  height: 40px;
+  color: rgb(220 220 220);
   pointer-events: none;
-  fill: white;
-  animation: image-viewer-spin 1s linear infinite;
+  animation: spin 1s linear infinite;
 }
 
-@keyframes image-viewer-spin {
+@keyframes spin {
   to {
     transform: rotate(1turn);
   }

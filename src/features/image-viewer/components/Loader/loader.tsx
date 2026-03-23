@@ -1,5 +1,5 @@
-import { Spinner } from "shared/icons";
+import { Icon } from "shared/components";
 
 import styles from "./loader.module.css";
 
-export const Loader = () => <Spinner className={styles.loader} />;
+export const Loader = () => <Icon className={styles.loader} name="spinner" />;
