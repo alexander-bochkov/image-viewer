@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import ImageViewer from "features/image-viewer";
 import { ModalWindow } from "./components/ModalWindow";
-import { useHidePageScrollbar, useOpenViewer } from "./hooks";
+import { useDisablePageInteraction, useOpenViewer } from "./hooks";
 
 import type { Nullable } from "shared/types";
 
@@ -17,7 +17,7 @@ const Viewer = () => {
   }, []);
 
   useOpenViewer({ enabled: !imageSrc, handler: handleViewerOpen });
-  useHidePageScrollbar(!!imageSrc);
+  useDisablePageInteraction(!!imageSrc);
 
   return (
     <ModalWindow onClose={handleViewerClose} show={!!imageSrc}>

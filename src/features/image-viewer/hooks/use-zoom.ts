@@ -90,8 +90,6 @@ export const useZoom = ({
 
   const onZoom = useCallback(
     (event: WheelEvent) => {
-      event.preventDefault();
-
       if (!containerRef.current || !imageRef.current) return;
 
       const { clientX, clientY, deltaY } = event;
@@ -120,7 +118,7 @@ export const useZoom = ({
   );
 
   useEffect(() => {
-    document.addEventListener("wheel", onZoom, { passive: false });
+    document.addEventListener("wheel", onZoom);
 
     return () => {
       document.removeEventListener("wheel", onZoom);

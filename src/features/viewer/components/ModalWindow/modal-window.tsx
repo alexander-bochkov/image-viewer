@@ -18,7 +18,7 @@ export const ModalWindow = ({
   const dialogId = useId();
   const selfRef = useRef<HTMLDialogElement>(null);
 
-  const handleClick = ({ target }: MouseEvent<HTMLDialogElement>) => {
+  const handleDialogClick = ({ target }: MouseEvent<HTMLDialogElement>) => {
     if (target === selfRef.current) selfRef.current.close();
   };
 
@@ -26,25 +26,11 @@ export const ModalWindow = ({
     show && selfRef.current?.showModal();
   }, [show]);
 
-  useEffect(() => {
-    const blockKeyboard = (event: KeyboardEvent) => {
-      show && event.stopPropagation();
-    };
-
-    document.addEventListener("keydown", blockKeyboard, { capture: true });
-    document.addEventListener("keyup", blockKeyboard, { capture: true });
-
-    return () => {
-      document.removeEventListener("keydown", blockKeyboard, { capture: true });
-      document.removeEventListener("keyup", blockKeyboard, { capture: true });
-    };
-  }, [show]);
-
   return (
     <dialog
       className={styles.modalWindow}
       id={dialogId}
-      onClick={handleClick}
+      onClick={handleDialogClick}
       onClose={onClose}
       ref={selfRef}
     >
