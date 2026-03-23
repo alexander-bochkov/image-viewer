@@ -8,6 +8,13 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   shape: "round" | "square";
   size: "small" | "medium";
   variant: "default" | "accent";
+  /**
+   * Currently command and commandFor attributes are not supported by @types/react:
+   * Issue: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/74664
+   * PR: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/74680
+   */
+  command?: string;
+  commandFor?: string;
 };
 
 export const Button = ({
