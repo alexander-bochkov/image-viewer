@@ -1,0 +1,7 @@
+.tools {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+  display: flex;
+  gap: 8px;
+}

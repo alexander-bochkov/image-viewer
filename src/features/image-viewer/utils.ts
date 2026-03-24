@@ -17,12 +17,18 @@ const getBoundingClientRectWithReserve = (el: HTMLElement): DOMRect => {
 export const getFitScale = (
   containerEl: HTMLElement,
   imageEl: HTMLImageElement,
+  rotation: number,
 ) => {
+  const isLandscape = Boolean(rotation % 180);
+
   const container = getBoundingClientRectWithReserve(containerEl);
   const { naturalHeight, naturalWidth } = imageEl;
 
-  const heightFitScale = container.height / naturalHeight;
-  const widthFitScale = container.width / naturalWidth;
+  const imageHeight = isLandscape ? naturalWidth : naturalHeight;
+  const imageWidth = isLandscape ? naturalHeight : naturalWidth;
+
+  const heightFitScale = container.height / imageHeight;
+  const widthFitScale = container.width / imageWidth;
 
   return Math.min(heightFitScale, widthFitScale, FULL_SIZE_SCALE);
 };
@@ -31,12 +37,18 @@ export const getMaxOffset = (
   containerEl: HTMLElement,
   imageEl: HTMLImageElement,
   scale: number,
+  rotation: number,
 ) => {
+  const isLandscape = Boolean(rotation % 180);
+
   const container = getBoundingClientRectWithReserve(containerEl);
   const { naturalHeight, naturalWidth } = imageEl;
 
-  const maxX = Math.round((naturalWidth * scale - container.width) / 2);
-  const maxY = Math.round((naturalHeight * scale - container.height) / 2);
+  const imageHeight = isLandscape ? naturalWidth : naturalHeight;
+  const imageWidth = isLandscape ? naturalHeight : naturalWidth;
+
+  const maxX = Math.round((imageWidth * scale - container.width) / 2);
+  const maxY = Math.round((imageHeight * scale - container.height) / 2);
 
   return {
     x: Math.max(maxX, 0),

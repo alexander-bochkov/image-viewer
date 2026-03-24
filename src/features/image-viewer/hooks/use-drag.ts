@@ -39,10 +39,16 @@ export const useDrag = ({
 
     const {
       offset: { x, y },
+      rotation,
       scale,
     } = view;
 
-    const { x: maxX, y: maxY } = getMaxOffset(containerEl, imageEl, scale);
+    const { x: maxX, y: maxY } = getMaxOffset(
+      containerEl,
+      imageEl,
+      scale,
+      rotation,
+    );
 
     const offsetX = x + movementX;
     const offsetY = y + movementY;

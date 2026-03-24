@@ -15,6 +15,7 @@ const getOffset = ({
   imageEl,
   nextScale,
   offset: { x, y },
+  rotation,
   round,
   scale,
 }: {
@@ -24,6 +25,7 @@ const getOffset = ({
   imageEl: HTMLImageElement;
   nextScale: number;
   offset: Offset;
+  rotation: number;
   round: boolean;
   scale: number;
 }) => {
@@ -37,7 +39,12 @@ const getOffset = ({
   const offsetX = x - (pointerX - x) * ratio;
   const offsetY = y - (pointerY - y) * ratio;
 
-  const { x: maxX, y: maxY } = getMaxOffset(containerEl, imageEl, nextScale);
+  const { x: maxX, y: maxY } = getMaxOffset(
+    containerEl,
+    imageEl,
+    nextScale,
+    rotation,
+  );
 
   const nextX = Math.min(Math.max(-maxX, offsetX), maxX);
   const nextY = Math.min(Math.max(-maxY, offsetY), maxY);
@@ -67,7 +74,7 @@ export const useZoom = ({
   }: MouseEvent<HTMLImageElement>) => {
     if (!containerRef.current || !imageRef.current) return;
 
-    const { offset, scale } = view;
+    const { offset, rotation, scale } = view;
 
     const nextScale =
       scale === fitScale.current || scale > FULL_SIZE_SCALE
@@ -81,11 +88,16 @@ export const useZoom = ({
       imageEl: imageRef.current,
       nextScale,
       offset,
+      rotation,
       round: true,
       scale,
     });
 
-    setView({ offset: nextOffset, scale: nextScale });
+    setView((prevView) => ({
+      ...prevView,
+      offset: nextOffset,
+      scale: nextScale,
+    }));
   };
 
   const onZoom = useCallback(
@@ -93,7 +105,7 @@ export const useZoom = ({
       if (!containerRef.current || !imageRef.current) return;
 
       const { clientX, clientY, deltaY } = event;
-      const { offset, scale } = view;
+      const { offset, rotation, scale } = view;
 
       const factor = -deltaY * 0.001 + 1;
       const nextScale = Math.min(
@@ -108,11 +120,16 @@ export const useZoom = ({
         imageEl: imageRef.current,
         nextScale,
         offset,
+        rotation,
         round: false,
         scale,
       });
 
-      setView({ offset: nextOffset, scale: nextScale });
+      setView((prevView) => ({
+        ...prevView,
+        offset: nextOffset,
+        scale: nextScale,
+      }));
     },
     [containerRef, fitScale, imageRef, setView, view],
   );

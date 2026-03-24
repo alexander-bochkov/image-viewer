@@ -11,11 +11,13 @@ export const useResize = ({
   fitScale,
   imageRef,
   setView,
+  view,
 }: {
   containerRef: RefObject<Nullable<HTMLDivElement>>;
   fitScale: RefObject<number>;
   imageRef: RefObject<Nullable<HTMLImageElement>>;
   setView: Dispatch<SetStateAction<View>>;
+  view: View;
 }) => {
   useEffect(() => {
     const handleResize = () => {
@@ -24,10 +26,14 @@ export const useResize = ({
       const containerEl = containerRef.current;
       const imageEl = imageRef.current;
 
-      const nextFitScale = getFitScale(containerEl, imageEl);
+      const nextFitScale = getFitScale(containerEl, imageEl, view.rotation);
 
       fitScale.current = nextFitScale;
-      setView({ offset: DEFAULT_OFFSET, scale: nextFitScale });
+      setView((prevView) => ({
+        ...prevView,
+        offset: DEFAULT_OFFSET,
+        scale: nextFitScale,
+      }));
     };
 
     window.addEventListener("resize", handleResize);
@@ -35,5 +41,5 @@ export const useResize = ({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [containerRef, fitScale, imageRef, setView]);
+  }, [containerRef, fitScale, imageRef, setView, view.rotation]);
 };
