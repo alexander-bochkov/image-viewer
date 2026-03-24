@@ -1,58 +1,43 @@
-import { Activity, useRef, useState } from "react";
-import { Container } from "./components/Container";
-import { Image } from "./components/Image";
-import { Loader } from "./components/Loader";
-import { Tools } from "./components/Tools";
-import { DEFAULT_OFFSET } from "./constants";
-import { useDrag, useResize, useRotation, useZoom } from "./hooks";
+import { Activity, useRef } from "react";
+import { Button, Icon, Loader, ModalWindow } from "shared/components";
+import { useDrag, useResize, useViewer, useZoom } from "./hooks";
 import { getFitScale } from "./utils";
 
-import type { MouseEvent, SyntheticEvent } from "react";
-import type { View } from "./types";
+import type { CSSProperties, MouseEvent, SyntheticEvent } from "react";
+import type { Viewer } from "./types";
 
-const INITIAL_FIT_SCALE = 0;
-const INITIAL_ROTATION = 0;
+import styles from "./image-viewer.module.css";
+
+const ROTATION_ANGLE = 90;
+const TRANSITION_DURATION = 150;
+
+const getImageStyle = ({
+  state: { offsetX, offsetY, rotation, scale },
+}: Viewer): CSSProperties => ({
+  rotate: `${rotation}deg`,
+  scale,
+  transitionDuration: `${TRANSITION_DURATION}ms`,
+  translate: `${offsetX}px ${offsetY}px`,
+});
 
 type ImageViewerProps = {
+  onClose?: () => void;
   src: string;
 };
 
-const ImageViewer = ({ src }: ImageViewerProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+const ImageViewer = ({ onClose, src }: ImageViewerProps) => {
   const imageRef = useRef<HTMLImageElement>(null);
 
-  const fitScale = useRef(INITIAL_FIT_SCALE);
+  const viewer = useViewer();
 
-  const [view, setView] = useState<View>({
-    offset: DEFAULT_OFFSET,
-    rotation: INITIAL_ROTATION,
-    scale: fitScale.current,
-  });
+  useResize(viewer, imageRef);
 
-  useResize({ containerRef, fitScale, imageRef, setView, view });
-
-  const { isDragging, onDrag, onDragEnd, onDragStart } = useDrag({
-    containerRef,
+  const { isDragging, onDrag, onDragEnd, onDragStart } = useDrag(
+    viewer,
     imageRef,
-    setView,
-    view,
-  });
+  );
 
-  const { rotate } = useRotation({
-    containerRef,
-    fitScale,
-    imageRef,
-    setView,
-    view,
-  });
-
-  const { onFullSizeZoom } = useZoom({
-    containerRef,
-    fitScale,
-    imageRef,
-    setView,
-    view,
-  });
+  const { onFullSizeZoom } = useZoom(viewer, imageRef);
 
   const handleClick = (event: MouseEvent<HTMLImageElement>) => {
     !isDragging && onFullSizeZoom(event);
@@ -60,39 +45,79 @@ const ImageViewer = ({ src }: ImageViewerProps) => {
   };
 
   const handleLoad = ({ currentTarget }: SyntheticEvent<HTMLImageElement>) => {
-    if (!containerRef.current) return;
+    const { dispatch, state } = viewer;
 
-    const nextFitScale = getFitScale(
-      containerRef.current,
-      currentTarget,
-      view.rotation,
-    );
+    const fitScale = getFitScale(currentTarget, state.rotation);
 
-    fitScale.current = nextFitScale;
-    setView((prevView) => ({ ...prevView, scale: nextFitScale }));
+    dispatch({ payload: fitScale, type: "SET_FIT_SCALE" });
+    dispatch({ payload: fitScale, type: "SET_SCALE" });
   };
 
+  const handleRotation = (angle: number) => {
+    if (!imageRef.current) return;
+
+    const { dispatch, state } = viewer;
+
+    const rotation = state.rotation + angle;
+    const fitScale = getFitScale(imageRef.current, rotation);
+
+    if (state.scale === state.fitScale) {
+      dispatch({ payload: rotation, type: "SET_ROTATION" });
+      dispatch({ payload: fitScale, type: "SET_FIT_SCALE" });
+      dispatch({ payload: fitScale, type: "SET_SCALE" });
+      dispatch({ type: "RESET_OFFSET" });
+    } else {
+      dispatch({ payload: state.fitScale, type: "SET_SCALE" });
+      dispatch({ type: "RESET_OFFSET" });
+
+      setTimeout(() => {
+        dispatch({ payload: rotation, type: "SET_ROTATION" });
+        dispatch({ payload: fitScale, type: "SET_FIT_SCALE" });
+        dispatch({ payload: fitScale, type: "SET_SCALE" });
+      }, TRANSITION_DURATION);
+    }
+  };
+
+  const isLoading = !viewer.state.scale;
+
   return (
-    <Container ref={containerRef}>
-      {!view.scale && <Loader />}
-      <Activity mode={view.scale ? "visible" : "hidden"}>
-        <Image
-          onClick={handleClick}
-          onLoad={handleLoad}
-          onMouseDown={onDragStart}
-          onMouseLeave={onDragEnd}
-          onMouseMove={onDrag}
-          ref={imageRef}
-          src={src}
-          style={{
-            rotate: `${view.rotation}deg`,
-            scale: view.scale,
-            translate: `${view.offset.x}px ${view.offset.y}px`,
-          }}
-        />
-        <Tools rotate={rotate} />
-      </Activity>
-    </Container>
+    <ModalWindow onClose={onClose}>
+      <div className={styles.imageViewer}>
+        {isLoading && <Loader />}
+        <Activity mode={isLoading ? "hidden" : "visible"}>
+          <img
+            className={styles.image}
+            draggable={false}
+            onClick={handleClick}
+            onLoad={handleLoad}
+            onMouseDown={onDragStart}
+            onMouseLeave={onDragEnd}
+            onMouseMove={onDrag}
+            ref={imageRef}
+            src={src}
+            style={getImageStyle(viewer)}
+          />
+          <div className={styles.tools}>
+            <Button
+              onClick={() => handleRotation(-ROTATION_ANGLE)}
+              shape="square"
+              size="medium"
+              variant="default"
+            >
+              <Icon name="rotate-left" />
+            </Button>
+            <Button
+              onClick={() => handleRotation(ROTATION_ANGLE)}
+              shape="square"
+              size="medium"
+              variant="default"
+            >
+              <Icon name="rotate-right" />
+            </Button>
+          </div>
+        </Activity>
+      </div>
+    </ModalWindow>
   );
 };
 

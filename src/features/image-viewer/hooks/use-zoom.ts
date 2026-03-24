@@ -1,146 +1,109 @@
-import { useCallback, useEffect } from "react";
-import { FULL_SIZE_SCALE } from "../constants";
-import { getMaxOffset } from "../utils";
+import { useEffect } from "react";
+import { getMaxOffset, getViewportSize } from "../utils";
 
-import type { Dispatch, MouseEvent, RefObject, SetStateAction } from "react";
+import type { MouseEvent, RefObject } from "react";
 import type { Nullable } from "shared/types";
-import type { Offset, View } from "../types";
+import type { Viewer } from "../types";
 
 const MAX_SCALE = 4;
 
 const getOffset = ({
   clientX,
   clientY,
-  containerEl,
-  imageEl,
-  nextScale,
-  offset: { x, y },
-  rotation,
-  round,
+  image,
+  round = false,
   scale,
+  viewer,
 }: {
   clientX: number;
   clientY: number;
-  containerEl: HTMLElement;
-  imageEl: HTMLImageElement;
-  nextScale: number;
-  offset: Offset;
-  rotation: number;
-  round: boolean;
+  image: HTMLImageElement;
+  round?: boolean;
   scale: number;
+  viewer: Viewer;
 }) => {
-  const container = containerEl.getBoundingClientRect();
+  const viewport = getViewportSize();
 
-  const pointerX = clientX - container.width / 2;
-  const pointerY = clientY - container.height / 2;
+  const mouseX = clientX - viewport.width / 2;
+  const mouseY = clientY - viewport.height / 2;
 
-  const ratio = nextScale / scale - 1;
+  const { state } = viewer;
 
-  const offsetX = x - (pointerX - x) * ratio;
-  const offsetY = y - (pointerY - y) * ratio;
+  const ratio = scale / state.scale - 1;
 
-  const { x: maxX, y: maxY } = getMaxOffset(
-    containerEl,
-    imageEl,
-    nextScale,
-    rotation,
-  );
+  const offsetX = state.offsetX - (mouseX - state.offsetX) * ratio;
+  const offsetY = state.offsetY - (mouseY - state.offsetY) * ratio;
 
-  const nextX = Math.min(Math.max(-maxX, offsetX), maxX);
-  const nextY = Math.min(Math.max(-maxY, offsetY), maxY);
+  const { x: maxX, y: maxY } = getMaxOffset(image, state.rotation, scale);
+
+  const x = Math.min(Math.max(-maxX, offsetX), maxX);
+  const y = Math.min(Math.max(-maxY, offsetY), maxY);
 
   return {
-    x: round ? Math.round(nextX) : nextX,
-    y: round ? Math.round(nextY) : nextY,
+    x: round ? Math.round(x) : x,
+    y: round ? Math.round(y) : y,
   };
 };
 
-export const useZoom = ({
-  containerRef,
-  fitScale,
-  imageRef,
-  setView,
-  view,
-}: {
-  containerRef: RefObject<Nullable<HTMLDivElement>>;
-  fitScale: RefObject<number>;
-  imageRef: RefObject<Nullable<HTMLImageElement>>;
-  setView: Dispatch<SetStateAction<View>>;
-  view: View;
-}) => {
+export const useZoom = (
+  viewer: Viewer,
+  imageRef: RefObject<Nullable<HTMLImageElement>>,
+) => {
   const onFullSizeZoom = ({
     clientX,
     clientY,
   }: MouseEvent<HTMLImageElement>) => {
-    if (!containerRef.current || !imageRef.current) return;
+    if (!imageRef.current) return;
 
-    const { offset, rotation, scale } = view;
+    const { dispatch, state } = viewer;
 
-    const nextScale =
-      scale === fitScale.current || scale > FULL_SIZE_SCALE
-        ? FULL_SIZE_SCALE
-        : fitScale.current;
+    const scale =
+      state.scale === state.fitScale || state.scale > 1 ? 1 : state.fitScale;
 
-    const nextOffset = getOffset({
+    const offset = getOffset({
       clientX,
       clientY,
-      containerEl: containerRef.current,
-      imageEl: imageRef.current,
-      nextScale,
-      offset,
-      rotation,
+      image: imageRef.current,
       round: true,
       scale,
+      viewer,
     });
 
-    setView((prevView) => ({
-      ...prevView,
-      offset: nextOffset,
-      scale: nextScale,
-    }));
+    dispatch({ payload: scale, type: "SET_SCALE" });
+    dispatch({ payload: offset, type: "SET_OFFSET" });
   };
 
-  const onZoom = useCallback(
-    (event: WheelEvent) => {
-      if (!containerRef.current || !imageRef.current) return;
+  useEffect(() => {
+    const zoom = ({ clientX, clientY, deltaY }: WheelEvent) => {
+      if (!imageRef.current) return;
 
-      const { clientX, clientY, deltaY } = event;
-      const { offset, rotation, scale } = view;
+      const { dispatch, state } = viewer;
 
       const factor = -deltaY * 0.001 + 1;
-      const nextScale = Math.min(
-        Math.max(fitScale.current, scale * factor),
+
+      const scale = Math.min(
+        Math.max(state.fitScale, state.scale * factor),
         MAX_SCALE,
       );
 
-      const nextOffset = getOffset({
+      const offset = getOffset({
         clientX,
         clientY,
-        containerEl: containerRef.current,
-        imageEl: imageRef.current,
-        nextScale,
-        offset,
-        rotation,
-        round: false,
+        image: imageRef.current,
         scale,
+        viewer,
       });
 
-      setView((prevView) => ({
-        ...prevView,
-        offset: nextOffset,
-        scale: nextScale,
-      }));
-    },
-    [containerRef, fitScale, imageRef, setView, view],
-  );
+      dispatch({ payload: scale, type: "SET_SCALE" });
+      dispatch({ payload: offset, type: "SET_OFFSET" });
+    };
 
-  useEffect(() => {
-    document.addEventListener("wheel", onZoom);
+    document.addEventListener("wheel", zoom);
 
     return () => {
-      document.removeEventListener("wheel", onZoom);
+      document.removeEventListener("wheel", zoom);
     };
-  }, [onZoom]);
+  }, [imageRef.current, viewer]);
 
   return { onFullSizeZoom };
 };

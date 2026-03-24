@@ -10,9 +10,9 @@
   border: none;
   backdrop-filter: blur(50px);
   transition:
-    display 100ms ease-out allow-discrete,
-    opacity 100ms ease-out,
-    overlay 100ms ease-out allow-discrete;
+    display ease-out allow-discrete,
+    opacity ease-out,
+    overlay ease-out allow-discrete;
 
   &:not([open]) {
     opacity: 0;
@@ -25,11 +25,11 @@
   &::backdrop {
     display: none;
   }
-}
 
-.closeButton {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  z-index: 1;
+  .closeButton {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 1;
+  }
 }

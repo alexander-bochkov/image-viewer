@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import ImageViewer from "features/image-viewer";
-import { ModalWindow } from "./components/ModalWindow";
 import { useDisablePageInteraction, useOpenViewer } from "./hooks";
 
 import type { Nullable } from "shared/types";
@@ -19,11 +18,7 @@ const Viewer = () => {
   useOpenViewer({ enabled: !imageSrc, handler: handleViewerOpen });
   useDisablePageInteraction(!!imageSrc);
 
-  return (
-    <ModalWindow onClose={handleViewerClose} show={!!imageSrc}>
-      {imageSrc && <ImageViewer src={imageSrc} />}
-    </ModalWindow>
-  );
+  return imageSrc && <ImageViewer onClose={handleViewerClose} src={imageSrc} />;
 };
 
 export default Viewer;

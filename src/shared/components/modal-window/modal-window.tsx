@@ -5,15 +5,15 @@ import type { MouseEvent, PropsWithChildren } from "react";
 
 import styles from "./modal-window.module.css";
 
+const TRANSITION_DURATION = 150;
+
 type ModalWindowProps = {
   onClose?: () => void;
-  show: boolean;
 };
 
 export const ModalWindow = ({
   children,
   onClose,
-  show,
 }: PropsWithChildren<ModalWindowProps>) => {
   const dialogId = useId();
   const selfRef = useRef<HTMLDialogElement>(null);
@@ -22,17 +22,22 @@ export const ModalWindow = ({
     if (target === selfRef.current) selfRef.current.close();
   };
 
+  const handleDialogClose = () => {
+    setTimeout(() => onClose?.(), TRANSITION_DURATION);
+  };
+
   useEffect(() => {
-    show && selfRef.current?.showModal();
-  }, [show]);
+    selfRef.current?.showModal();
+  }, []);
 
   return (
     <dialog
       className={styles.modalWindow}
       id={dialogId}
       onClick={handleDialogClick}
-      onClose={onClose}
+      onClose={handleDialogClose}
       ref={selfRef}
+      style={{ transitionDuration: `${TRANSITION_DURATION}ms` }}
     >
       <Button
         className={styles.closeButton}

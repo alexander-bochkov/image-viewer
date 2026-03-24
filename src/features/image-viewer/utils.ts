@@ -1,57 +1,45 @@
-import { FULL_SIZE_SCALE } from "./constants";
+const isPortrait = (rotation: number) => !(rotation % 180);
 
-const getBoundingClientRectWithReserve = (el: HTMLElement): DOMRect => {
-  const rect = el.getBoundingClientRect();
+export const getViewportSize = (withBuffer = false) => {
+  const buffer = withBuffer ? 1 : 0;
 
-  const height = rect.height + 2;
-  const width = rect.width + 2;
-
-  const bottom = rect.bottom + 1;
-  const left = rect.left - 1;
-  const right = rect.right + 1;
-  const top = rect.top - 1;
-
-  return { ...rect, bottom, height, left, right, top, width };
+  return {
+    height: window.innerHeight + buffer,
+    width: window.innerWidth + buffer,
+  };
 };
 
-export const getFitScale = (
-  containerEl: HTMLElement,
-  imageEl: HTMLImageElement,
-  rotation: number,
-) => {
-  const isLandscape = Boolean(rotation % 180);
+export const getFitScale = (image: HTMLImageElement, rotation: number) => {
+  const { naturalHeight, naturalWidth } = image;
 
-  const container = getBoundingClientRectWithReserve(containerEl);
-  const { naturalHeight, naturalWidth } = imageEl;
+  const imageHeight = isPortrait(rotation) ? naturalHeight : naturalWidth;
+  const imageWidth = isPortrait(rotation) ? naturalWidth : naturalHeight;
 
-  const imageHeight = isLandscape ? naturalWidth : naturalHeight;
-  const imageWidth = isLandscape ? naturalHeight : naturalWidth;
+  const viewport = getViewportSize(true);
 
-  const heightFitScale = container.height / imageHeight;
-  const widthFitScale = container.width / imageWidth;
+  const scaleX = viewport.width / imageWidth;
+  const scaleY = viewport.height / imageHeight;
 
-  return Math.min(heightFitScale, widthFitScale, FULL_SIZE_SCALE);
+  return Math.min(scaleX, scaleY, 1);
 };
 
 export const getMaxOffset = (
-  containerEl: HTMLElement,
-  imageEl: HTMLImageElement,
-  scale: number,
+  image: HTMLImageElement,
   rotation: number,
+  scale: number,
 ) => {
-  const isLandscape = Boolean(rotation % 180);
+  const { naturalHeight, naturalWidth } = image;
 
-  const container = getBoundingClientRectWithReserve(containerEl);
-  const { naturalHeight, naturalWidth } = imageEl;
+  const imageHeight = isPortrait(rotation) ? naturalHeight : naturalWidth;
+  const imageWidth = isPortrait(rotation) ? naturalWidth : naturalHeight;
 
-  const imageHeight = isLandscape ? naturalWidth : naturalHeight;
-  const imageWidth = isLandscape ? naturalHeight : naturalWidth;
+  const viewport = getViewportSize(true);
 
-  const maxX = Math.round((imageWidth * scale - container.width) / 2);
-  const maxY = Math.round((imageHeight * scale - container.height) / 2);
+  const offsetX = Math.round((imageWidth * scale - viewport.width) / 2);
+  const offsetY = Math.round((imageHeight * scale - viewport.height) / 2);
 
   return {
-    x: Math.max(maxX, 0),
-    y: Math.max(maxY, 0),
+    x: Math.max(offsetX, 0),
+    y: Math.max(offsetY, 0),
   };
 };

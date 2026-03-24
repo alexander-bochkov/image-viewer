@@ -1,45 +1,31 @@
 import { useEffect } from "react";
-import { DEFAULT_OFFSET } from "../constants";
 import { getFitScale } from "../utils";
 
-import type { Dispatch, RefObject, SetStateAction } from "react";
+import type { RefObject } from "react";
 import type { Nullable } from "shared/types";
-import type { View } from "../types";
+import type { Viewer } from "../types";
 
-export const useResize = ({
-  containerRef,
-  fitScale,
-  imageRef,
-  setView,
-  view,
-}: {
-  containerRef: RefObject<Nullable<HTMLDivElement>>;
-  fitScale: RefObject<number>;
-  imageRef: RefObject<Nullable<HTMLImageElement>>;
-  setView: Dispatch<SetStateAction<View>>;
-  view: View;
-}) => {
+export const useResize = (
+  viewer: Viewer,
+  imageRef: RefObject<Nullable<HTMLImageElement>>,
+) => {
   useEffect(() => {
-    const handleResize = () => {
-      if (!containerRef.current || !imageRef.current) return;
+    const resize = () => {
+      if (!imageRef.current) return;
 
-      const containerEl = containerRef.current;
-      const imageEl = imageRef.current;
+      const { dispatch, state } = viewer;
 
-      const nextFitScale = getFitScale(containerEl, imageEl, view.rotation);
+      const fitScale = getFitScale(imageRef.current, state.rotation);
 
-      fitScale.current = nextFitScale;
-      setView((prevView) => ({
-        ...prevView,
-        offset: DEFAULT_OFFSET,
-        scale: nextFitScale,
-      }));
+      dispatch({ payload: fitScale, type: "SET_FIT_SCALE" });
+      dispatch({ payload: fitScale, type: "SET_SCALE" });
+      dispatch({ type: "RESET_OFFSET" });
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", resize);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", resize);
     };
-  }, [containerRef, fitScale, imageRef, setView, view.rotation]);
+  }, [imageRef.current, viewer]);
 };
