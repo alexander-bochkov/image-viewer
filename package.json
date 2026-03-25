@@ -2,8 +2,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build --watch",
-    "biome": "biome check"
+    "biome": "biome check",
+    "build": "tsc && vite build",
+    "start": "vite build --watch",
+    "typescript": "tsc"
   },
   "dependencies": {
     "clsx": "2.1.1",
