@@ -12,17 +12,18 @@
     /* Language and Environment */
     "jsx": "preserve",
     "moduleDetection": "force",
-    "target": "esnext",
 
     /* Modules */
-    "baseUrl": "src",
-    "module": "esnext",
     "moduleResolution": "bundler",
+    "paths": {
+      "assets/*": ["./src/assets/*"],
+      "features/*": ["./src/features/*"],
+      "shared/*": ["./src/shared/*"]
+    },
 
     /* Type Checking */
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "strict": true
+    "noUnusedParameters": true
   }
 }
