@@ -23,3 +23,7 @@
     gap: 8px;
   }
 }
+
+.hideScrollbar {
+  scrollbar-width: none !important;
+}

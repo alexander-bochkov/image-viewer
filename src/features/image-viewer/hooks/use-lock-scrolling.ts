@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 
-export const useLockScrolling = (enabled: boolean) => {
+export const useLockScrolling = () => {
   useEffect(() => {
     const lockScrolling = (event: WheelEvent) => {
-      enabled && event.preventDefault();
+      event.preventDefault();
     };
 
     document.addEventListener("wheel", lockScrolling, { passive: false });
@@ -11,5 +11,5 @@ export const useLockScrolling = (enabled: boolean) => {
     return () => {
       document.removeEventListener("wheel", lockScrolling);
     };
-  }, [enabled]);
+  }, []);
 };
