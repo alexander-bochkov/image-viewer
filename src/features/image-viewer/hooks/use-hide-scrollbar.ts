@@ -1,13 +1,18 @@
 import { useEffect } from "react";
 
-import styles from "../image-viewer.module.css";
-
 export const useHideScrollbar = () => {
   useEffect(() => {
-    document.documentElement.classList.add(styles.hideScrollbar);
+    const { clientWidth } = document.documentElement;
+    const { innerWidth } = window;
+
+    const scrollbarWidth = innerWidth - clientWidth;
+
+    document.documentElement.style.paddingRight = `${scrollbarWidth}px`;
+    document.documentElement.style.scrollbarWidth = "none";
 
     return () => {
-      document.documentElement.classList.remove(styles.hideScrollbar);
+      document.documentElement.style.paddingRight = "";
+      document.documentElement.style.scrollbarWidth = "";
     };
   }, []);
 };
