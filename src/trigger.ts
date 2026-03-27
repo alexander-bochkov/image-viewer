@@ -16,6 +16,7 @@ export class Trigger {
   private injector: Injector;
 
   private movement = DEFAULT_MOVEMENT;
+  private timeHasPassed: boolean = false;
   private timerID: Optional<TimerID>;
 
   constructor(injector: Injector) {
@@ -29,8 +30,12 @@ export class Trigger {
 
   private register(src: Nullable<string>) {
     this.timerID = setTimeout(() => {
-      src && this.render(src);
-      this.unregister();
+      if (src) {
+        this.render(src);
+        this.unregister();
+      } else {
+        this.timeHasPassed = true;
+      }
     }, DELAY);
   }
 
@@ -43,7 +48,11 @@ export class Trigger {
   private handleClick(event: MouseEvent) {
     if (this.timerID) {
       this.unregister();
-    } else {
+    }
+
+    if (this.timeHasPassed) {
+      this.timeHasPassed = false;
+
       event.preventDefault();
       event.stopPropagation();
     }
@@ -64,6 +73,7 @@ export class Trigger {
 
     if (Math.max(this.movement.x, this.movement.y) > MOVEMENT_THRESHOLD) {
       this.unregister();
+      this.timeHasPassed = false;
     }
   }
 
