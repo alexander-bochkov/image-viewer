@@ -18,6 +18,7 @@
     "paths": {
       "assets/*": ["./src/assets/*"],
       "features/*": ["./src/features/*"],
+      "scripts": ["./src/scripts"],
       "shared/*": ["./src/shared/*"]
     },
 

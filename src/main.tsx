@@ -1,7 +1,8 @@
-import { Injector } from "./injector";
-import { Trigger } from "./trigger";
+import { Injector, Trigger } from "scripts";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const trigger = new Trigger(new Injector());
-  trigger.init();
+  const injector = new Injector();
+  const trigger = new Trigger(injector);
+
+  trigger.register();
 });
