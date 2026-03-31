@@ -1,13 +1,4 @@
-const IMAGE_EXTENSIONS = [
-  "avif",
-  "bmp",
-  "gif",
-  "jpeg",
-  "jpg",
-  "png",
-  "svg",
-  "webp",
-];
+import { isImage, isVideo } from "shared/utils";
 
 const getLargestSrcFromSrcset = (srcset: string) => {
   const mappedSrcset = srcset.split(",").map((set) => {
@@ -30,17 +21,24 @@ const getLargestSrcFromSrcset = (srcset: string) => {
   return largestSrc;
 };
 
-const isAnchorToImage = (anchor: HTMLAnchorElement) =>
-  IMAGE_EXTENSIONS.some((extension) => anchor.href.endsWith(`.${extension}`));
+const getFirstSourceElement = (elements: HTMLCollection) =>
+  [...elements].find((element) => element instanceof HTMLSourceElement);
 
 export const parseSrc = (element: HTMLElement) => {
-  if (element instanceof HTMLImageElement) {
-    const { src, srcset } = element;
-    return srcset ? getLargestSrcFromSrcset(srcset) : src;
+  if (element instanceof HTMLAnchorElement) {
+    const { href } = element;
+    if (isImage(href) || isVideo(href)) return href;
   }
 
-  if (element instanceof HTMLAnchorElement && isAnchorToImage(element)) {
-    return element.href;
+  if (element instanceof HTMLImageElement) {
+    const { src, srcset } = element;
+    return (srcset && getLargestSrcFromSrcset(srcset)) || src;
+  }
+
+  if (element instanceof HTMLVideoElement) {
+    const { children, src } = element;
+    const source = getFirstSourceElement(children);
+    return source?.src || src;
   }
 
   return null;

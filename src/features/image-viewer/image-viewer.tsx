@@ -1,14 +1,11 @@
 import { Activity, useRef } from "react";
 import { Button, Icon, Loader, ModalWindow } from "shared/components";
 import {
-  useDrag,
   useHideScrollbar,
   useLockKeyboard,
   useLockScrolling,
-  useResize,
-  useViewer,
-  useZoom,
-} from "./hooks";
+} from "shared/hooks";
+import { useDrag, useResize, useViewer, useZoom } from "./hooks";
 import { getFitScale } from "./utils";
 
 import type { CSSProperties, MouseEvent, SyntheticEvent } from "react";
@@ -94,41 +91,39 @@ const ImageViewer = ({ onClose, src }: ImageViewerProps) => {
 
   return (
     <ModalWindow onClose={onClose}>
-      <div className={styles.imageViewer}>
-        {isLoading && <Loader />}
-        <Activity mode={isLoading ? "hidden" : "visible"}>
-          <img
-            className={styles.image}
-            draggable={false}
-            onClick={handleClick}
-            onLoad={handleLoad}
-            onMouseDown={onDragStart}
-            onMouseLeave={onDragEnd}
-            onMouseMove={onDrag}
-            ref={imageRef}
-            src={src}
-            style={getImageStyle(viewer)}
-          />
-          <div className={styles.tools}>
-            <Button
-              onClick={() => handleRotation(-ROTATION_ANGLE)}
-              shape="square"
-              size="medium"
-              variant="default"
-            >
-              <Icon name="rotate-left" />
-            </Button>
-            <Button
-              onClick={() => handleRotation(ROTATION_ANGLE)}
-              shape="square"
-              size="medium"
-              variant="default"
-            >
-              <Icon name="rotate-right" />
-            </Button>
-          </div>
-        </Activity>
-      </div>
+      {isLoading && <Loader />}
+      <Activity mode={isLoading ? "hidden" : "visible"}>
+        <img
+          className={styles.image}
+          draggable={false}
+          onClick={handleClick}
+          onLoad={handleLoad}
+          onMouseDown={onDragStart}
+          onMouseLeave={onDragEnd}
+          onMouseMove={onDrag}
+          ref={imageRef}
+          src={src}
+          style={getImageStyle(viewer)}
+        />
+        <div className={styles.tools}>
+          <Button
+            onClick={() => handleRotation(-ROTATION_ANGLE)}
+            shape="square"
+            size="medium"
+            variant="default"
+          >
+            <Icon name="rotate-left" />
+          </Button>
+          <Button
+            onClick={() => handleRotation(ROTATION_ANGLE)}
+            shape="square"
+            size="medium"
+            variant="default"
+          >
+            <Icon name="rotate-right" />
+          </Button>
+        </div>
+      </Activity>
     </ModalWindow>
   );
 };

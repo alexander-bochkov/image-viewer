@@ -1,2 +1,2 @@
-export { Injector } from "./injector";
-export { Trigger } from "./trigger";
+export * from "./injector";
+export * from "./trigger";

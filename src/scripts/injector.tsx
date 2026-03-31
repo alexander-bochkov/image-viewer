@@ -1,8 +1,21 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import ImageViewer from "features/image-viewer";
+import VideoViewer from "features/video-viewer";
+import { isImage, isVideo } from "shared/utils";
 
 import type { Root } from "react-dom/client";
+
+const getViewer = (props: { onClose: () => void; src: string }) => {
+  switch (true) {
+    case isImage(props.src):
+      return <ImageViewer {...props} />;
+    case isVideo(props.src):
+      return <VideoViewer {...props} />;
+    default:
+      return null;
+  }
+};
 
 export class Injector {
   private root: HTMLElement;
@@ -52,9 +65,7 @@ export class Injector {
     };
 
     this.reactRoot.render(
-      <StrictMode>
-        <ImageViewer onClose={handleClose} src={src} />
-      </StrictMode>,
+      <StrictMode>{getViewer({ onClose: handleClose, src })}</StrictMode>,
     );
   }
 
