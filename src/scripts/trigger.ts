@@ -45,19 +45,19 @@ export class Trigger {
   }
 
   private handleMouseDown({ button, target }: MouseEvent) {
-    if (button !== PRIMARY_MOUSE_BUTTON || !target) return;
+    if (button === PRIMARY_MOUSE_BUTTON && target instanceof HTMLElement) {
+      const src = parseSrc(target);
 
-    const src = parseSrc(target);
-
-    this.setTimer(() => {
-      if (src) {
-        this.trigger(src);
-        this.clearTimer();
-        this.mouseMovement = DEFAULT_MOUSE_MOVEMENT;
-      } else {
-        this.preventDefaultAction = true;
-      }
-    });
+      this.setTimer(() => {
+        if (src) {
+          this.trigger(src);
+          this.clearTimer();
+          this.mouseMovement = DEFAULT_MOUSE_MOVEMENT;
+        } else {
+          this.preventDefaultAction = true;
+        }
+      });
+    }
   }
 
   private handleMouseMove({ movementX, movementY }: MouseEvent) {
