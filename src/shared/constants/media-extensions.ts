@@ -1,5 +1,3 @@
-export const PRIMARY_MOUSE_BUTTON = 0;
-
 export const IMAGE_EXTENSIONS = [
   "avif",
   "bmp",

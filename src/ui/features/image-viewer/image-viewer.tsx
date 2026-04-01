@@ -1,10 +1,11 @@
 import { Activity, useRef } from "react";
-import { Button, Icon, Loader, ModalWindow } from "shared/components";
-import { useHideScrollbar, useKeyboard, useLockScrolling } from "shared/hooks";
+import { Button, Icon, Loader, ModalWindow } from "ui/components";
+import { useHideScrollbar, useKeyboard, useLockScrolling } from "ui/hooks";
 import { useDrag, useResize, useViewer, useZoom } from "./hooks";
 import { getFitScale } from "./utils";
 
 import type { CSSProperties, MouseEvent, SyntheticEvent } from "react";
+import type { ViewerProps } from "ui/types";
 import type { Viewer } from "./types";
 
 import styles from "./image-viewer.module.css";
@@ -21,19 +22,14 @@ const getImageStyle = ({
   translate: `${offsetX}px ${offsetY}px`,
 });
 
-type ImageViewerProps = {
-  onClose?: () => void;
-  src: string;
-};
-
-const ImageViewer = ({ onClose, src }: ImageViewerProps) => {
-  const imageRef = useRef<HTMLImageElement>(null);
-
-  const viewer = useViewer();
-
+export const ImageViewer = ({ onClose, url }: ViewerProps) => {
   useHideScrollbar();
   useKeyboard();
   useLockScrolling();
+
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  const viewer = useViewer();
 
   useResize(viewer, imageRef);
 
@@ -98,7 +94,7 @@ const ImageViewer = ({ onClose, src }: ImageViewerProps) => {
           onMouseLeave={onDragEnd}
           onMouseMove={onDrag}
           ref={imageRef}
-          src={src}
+          src={url}
           style={getImageStyle(viewer)}
         />
         <div className={styles.tools}>
@@ -123,5 +119,3 @@ const ImageViewer = ({ onClose, src }: ImageViewerProps) => {
     </ModalWindow>
   );
 };
-
-export default ImageViewer;

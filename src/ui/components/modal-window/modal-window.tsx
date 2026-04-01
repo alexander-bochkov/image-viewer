@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef } from "react";
-import { Button, Icon } from "shared/components";
+import { Button, Icon } from "ui/components";
 
 import type { MouseEvent, PropsWithChildren } from "react";
 
@@ -15,8 +15,9 @@ export const ModalWindow = ({
   children,
   onClose,
 }: PropsWithChildren<ModalWindowProps>) => {
-  const dialogId = useId();
   const selfRef = useRef<HTMLDialogElement>(null);
+
+  const dialogId = useId();
 
   const handleDialogClick = ({ target }: MouseEvent<HTMLDialogElement>) => {
     if (target === selfRef.current) selfRef.current.close();

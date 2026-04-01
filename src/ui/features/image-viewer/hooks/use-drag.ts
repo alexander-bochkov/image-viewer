@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PRIMARY_MOUSE_BUTTON } from "shared/constants";
+import { MOUSE_BUTTON_CODES } from "shared/constants";
 import { getMaxOffset } from "../utils";
 
 import type { MouseEvent, RefObject } from "react";
@@ -14,7 +14,7 @@ export const useDrag = (
   const [isDragging, setIsDragging] = useState(false);
 
   const onDragStart = ({ button }: MouseEvent<HTMLImageElement>) => {
-    if (button === PRIMARY_MOUSE_BUTTON) setCanDrag(true);
+    if (button === MOUSE_BUTTON_CODES.LEFT) setCanDrag(true);
   };
 
   const onDragEnd = () => {

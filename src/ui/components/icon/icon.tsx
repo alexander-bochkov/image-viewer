@@ -1,13 +1,10 @@
 import type { FC, SVGProps } from "react";
 
-const modules = import.meta.glob<FC<SVGProps<SVGSVGElement>>>(
-  "/src/assets/icons/*.svg",
-  {
-    eager: true,
-    import: "default",
-    query: "?react",
-  },
-);
+const modules = import.meta.glob<FC<SVGProps<SVGSVGElement>>>("./icons/*.svg", {
+  eager: true,
+  import: "default",
+  query: "?react",
+});
 
 const icons = Object.fromEntries(
   Object.entries(modules).map(([path, module]) => [

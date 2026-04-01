@@ -1,8 +1,9 @@
-import { PRIMARY_MOUSE_BUTTON } from "shared/constants";
-import { parseSrc } from "./parse-src";
+import { MOUSE_BUTTON_CODES } from "shared/constants";
+import { getMediaDetails } from "./get-media-details";
 
 import type { Optional } from "shared/types";
 import type { Injector } from "./injector";
+import type { MediaDetails } from "./types";
 
 const DEFAULT_MOUSE_MOVEMENT = { x: 0, y: 0 };
 const DELAY = 300;
@@ -34,23 +35,23 @@ export class Trigger {
     this.timerID = undefined;
   }
 
-  private trigger(src: string) {
+  private trigger(media: MediaDetails) {
     this.unregister();
 
     const onClose = () => {
       this.register();
     };
 
-    this.injector.mount(src, onClose);
+    this.injector.mount(media, onClose);
   }
 
   private handleMouseDown({ button, target }: MouseEvent) {
-    if (button === PRIMARY_MOUSE_BUTTON && target instanceof HTMLElement) {
-      const src = parseSrc(target);
+    if (button === MOUSE_BUTTON_CODES.LEFT && target instanceof HTMLElement) {
+      const media = getMediaDetails(target);
 
       this.setTimer(() => {
-        if (src) {
-          this.trigger(src);
+        if (media?.url) {
+          this.trigger(media);
           this.clearTimer();
           this.mouseMovement = DEFAULT_MOUSE_MOVEMENT;
         } else {

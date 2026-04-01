@@ -1,4 +1,4 @@
-import { Icon } from "shared/components";
+import { Icon } from "ui/components";
 
 import styles from "./loader.module.css";
 
