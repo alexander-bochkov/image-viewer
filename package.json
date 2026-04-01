@@ -1,4 +1,8 @@
 {
+  "name": "swiftview-extension",
+  "version": "0.1.0",
+  "description": "Google Chrome extension for viewing images and videos in a separate modal window.",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
