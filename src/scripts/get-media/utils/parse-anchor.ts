@@ -1,7 +1,7 @@
 import { IMAGE_EXTENSIONS, VIDEO_EXTENSIONS } from "shared/constants";
 
 import type { Nullable } from "shared/types";
-import type { MediaDetails, MediaType } from "../../types";
+import type { Media } from "../../types";
 
 const isImage = (url: string) =>
   IMAGE_EXTENSIONS.some(
@@ -17,10 +17,8 @@ const isVideo = (url: string) =>
       url.endsWith(`.${extension}`),
   );
 
-export const parseAnchor = ({
-  href,
-}: HTMLAnchorElement): Nullable<MediaDetails> => {
-  let type: Nullable<MediaType> = null;
+export const parseAnchor = ({ href }: HTMLAnchorElement): Nullable<Media> => {
+  let type: Nullable<Media["type"]> = null;
 
   if (isImage(href)) type = "image";
   if (isVideo(href)) type = "video";

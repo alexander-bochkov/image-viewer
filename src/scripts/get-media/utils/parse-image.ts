@@ -1,4 +1,4 @@
-import type { MediaDetails } from "../../types";
+import type { Media } from "../../types";
 
 const getUrlFromSrcset = (srcset: string) => {
   const formattedSrcset = srcset.split(",").map((set) => {
@@ -21,7 +21,7 @@ const getUrlFromSrcset = (srcset: string) => {
   return largestSrc;
 };
 
-export const parseImage = ({ src, srcset }: HTMLImageElement): MediaDetails => {
+export const parseImage = ({ src, srcset }: HTMLImageElement): Media => {
   const url = (srcset && getUrlFromSrcset(srcset)) || src;
   return { type: "image", url };
 };

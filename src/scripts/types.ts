@@ -1,6 +1,4 @@
-export type MediaType = "image" | "video";
-
-export type MediaDetails = {
-  type: MediaType;
+export type Media = {
+  type: "image" | "video";
   url: string;
 };

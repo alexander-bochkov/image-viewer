@@ -1,9 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { ImageViewer, VideoViewer } from "ui/features";
+import { ImageViewer, VideoViewer } from "ui";
 
 import type { Root } from "react-dom/client";
-import type { MediaDetails } from "./types";
+import type { Media } from "./types";
+
+const ROOT = "swiftview-root";
 
 export class Injector {
   private root: HTMLElement;
@@ -11,7 +13,7 @@ export class Injector {
   private reactRoot: Root;
 
   constructor() {
-    this.root = document.createElement("swiftview-root");
+    this.root = document.createElement(ROOT);
     document.body.appendChild(this.root);
 
     this.shadowRoot = this.root.attachShadow({ mode: "closed" });
@@ -44,7 +46,7 @@ export class Injector {
     observer.observe(document.body, { childList: true });
   }
 
-  mount({ type, url }: MediaDetails, onClose: () => void) {
+  mount({ type, url }: Media, onClose: () => void) {
     const handleClose = () => {
       onClose();
 

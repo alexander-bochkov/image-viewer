@@ -16,8 +16,9 @@
     /* Modules */
     "moduleResolution": "bundler",
     "paths": {
-      "scripts": ["./src/scripts"],
+      "scripts": ["./src/scripts/index"],
       "shared/*": ["./src/shared/*"],
+      "ui": ["./src/ui/index"],
       "ui/*": ["./src/ui/*"]
     },
 

@@ -1,33 +1,29 @@
 import { MOUSE_BUTTON_CODES } from "shared/constants";
-import { getMediaDetails } from "./get-media-details";
+import { getMedia } from "./get-media";
 
 import type { Optional } from "shared/types";
 import type { Injector } from "./injector";
-import type { MediaDetails } from "./types";
+import type { Media } from "./types";
 
-const DEFAULT_MOUSE_MOVEMENT = { x: 0, y: 0 };
-const DELAY = 300;
-const MOUSE_MOVEMENT_THRESHOLD = 3;
+const TRIGGER_DELAY = 300;
 
 type TimerID = ReturnType<typeof setTimeout>;
 
 export class Trigger {
   private injector: Injector;
-
-  private mouseMovement = DEFAULT_MOUSE_MOVEMENT;
-  private preventDefaultAction = false;
+  private preventClick = false;
   private timerID: Optional<TimerID>;
 
   constructor(injector: Injector) {
     this.injector = injector;
 
     this.handleClick = this.handleClick.bind(this);
+    this.handleDragStart = this.handleDragStart.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
-    this.handleMouseMove = this.handleMouseMove.bind(this);
   }
 
   private setTimer(handler: TimerHandler) {
-    this.timerID = setTimeout(handler, DELAY);
+    this.timerID = setTimeout(handler, TRIGGER_DELAY);
   }
 
   private clearTimer() {
@@ -35,7 +31,7 @@ export class Trigger {
     this.timerID = undefined;
   }
 
-  private trigger(media: MediaDetails) {
+  private trigger(media: Media) {
     this.unregister();
 
     const onClose = () => {
@@ -47,60 +43,47 @@ export class Trigger {
 
   private handleMouseDown({ button, target }: MouseEvent) {
     if (button === MOUSE_BUTTON_CODES.LEFT && target instanceof HTMLElement) {
-      const media = getMediaDetails(target);
+      const media = getMedia(target);
 
       this.setTimer(() => {
         if (media?.url) {
           this.trigger(media);
           this.clearTimer();
-          this.mouseMovement = DEFAULT_MOUSE_MOVEMENT;
         } else {
-          this.preventDefaultAction = true;
+          this.preventClick = true;
         }
       });
     }
   }
 
-  private handleMouseMove({ movementX, movementY }: MouseEvent) {
-    if (!this.timerID) return;
-
-    this.mouseMovement.x += Math.abs(movementX);
-    this.mouseMovement.y += Math.abs(movementY);
-
-    if (
-      Math.max(this.mouseMovement.x, this.mouseMovement.y) >
-      MOUSE_MOVEMENT_THRESHOLD
-    ) {
-      this.clearTimer();
-      this.mouseMovement = DEFAULT_MOUSE_MOVEMENT;
-      this.preventDefaultAction = false;
-    }
+  private handleDragStart() {
+    this.clearTimer();
+    this.preventClick = false;
   }
 
   private handleClick(event: MouseEvent) {
     if (this.timerID) {
       this.clearTimer();
-      this.mouseMovement = DEFAULT_MOUSE_MOVEMENT;
     }
 
-    if (this.preventDefaultAction) {
+    if (this.preventClick) {
       event.preventDefault();
       event.stopImmediatePropagation();
       event.stopPropagation();
 
-      this.preventDefaultAction = false;
+      this.preventClick = false;
     }
   }
 
   register() {
     document.addEventListener("click", this.handleClick, true);
+    document.addEventListener("dragstart", this.handleDragStart, true);
     document.addEventListener("mousedown", this.handleMouseDown, true);
-    document.addEventListener("mousemove", this.handleMouseMove, true);
   }
 
   unregister() {
     document.removeEventListener("click", this.handleClick, true);
+    document.removeEventListener("dragstart", this.handleDragStart, true);
     document.removeEventListener("mousedown", this.handleMouseDown, true);
-    document.removeEventListener("mousemove", this.handleMouseMove, true);
   }
 }
