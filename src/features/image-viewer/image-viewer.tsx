@@ -1,10 +1,6 @@
 import { Activity, useRef } from "react";
 import { Button, Icon, Loader, ModalWindow } from "shared/components";
-import {
-  useHideScrollbar,
-  useLockKeyboard,
-  useLockScrolling,
-} from "shared/hooks";
+import { useHideScrollbar, useKeyboard, useLockScrolling } from "shared/hooks";
 import { useDrag, useResize, useViewer, useZoom } from "./hooks";
 import { getFitScale } from "./utils";
 
@@ -36,7 +32,7 @@ const ImageViewer = ({ onClose, src }: ImageViewerProps) => {
   const viewer = useViewer();
 
   useHideScrollbar();
-  useLockKeyboard();
+  useKeyboard();
   useLockScrolling();
 
   useResize(viewer, imageRef);

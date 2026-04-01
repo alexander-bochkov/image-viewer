@@ -2,14 +2,14 @@ import { useEffect } from "react";
 
 export const useLockScrolling = () => {
   useEffect(() => {
-    const lockScrolling = (event: WheelEvent) => {
+    const handleScrollingLock = (event: WheelEvent) => {
       event.preventDefault();
     };
 
-    document.addEventListener("wheel", lockScrolling, { passive: false });
+    document.addEventListener("wheel", handleScrollingLock, { passive: false });
 
     return () => {
-      document.removeEventListener("wheel", lockScrolling);
+      document.removeEventListener("wheel", handleScrollingLock);
     };
   }, []);
 };

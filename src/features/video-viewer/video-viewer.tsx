@@ -1,12 +1,11 @@
-import { Activity, useState } from "react";
+import { Activity, useCallback, useRef, useState } from "react";
 import { Loader, ModalWindow } from "shared/components";
-import {
-  useHideScrollbar,
-  useLockKeyboard,
-  useLockScrolling,
-} from "shared/hooks";
+import { useHideScrollbar, useKeyboard, useLockScrolling } from "shared/hooks";
 
 import styles from "./video-viewer.module.css";
+
+const ENTER_KEY = "Enter";
+const SPACE_KEY = " ";
 
 type VideoViewerProps = {
   onClose?: () => void;
@@ -14,10 +13,22 @@ type VideoViewerProps = {
 };
 
 const VideoViewer = ({ onClose, src }: VideoViewerProps) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const [isLoading, setIsLoading] = useState(true);
 
+  const handleKeyboard = useCallback(({ key, type }: KeyboardEvent) => {
+    if (!videoRef.current || type !== "keydown") return;
+
+    const video = videoRef.current;
+
+    if (key === ENTER_KEY || key === SPACE_KEY) {
+      video.paused ? video.play() : video.pause();
+    }
+  }, []);
+
   useHideScrollbar();
-  useLockKeyboard();
+  useKeyboard(handleKeyboard);
   useLockScrolling();
 
   const handleCanPlay = () => {
@@ -34,6 +45,7 @@ const VideoViewer = ({ onClose, src }: VideoViewerProps) => {
           controls
           loop
           onCanPlay={handleCanPlay}
+          ref={videoRef}
           src={src}
         />
       </Activity>

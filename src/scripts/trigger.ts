@@ -4,11 +4,11 @@ import { parseSrc } from "./parse-src";
 import type { Optional } from "shared/types";
 import type { Injector } from "./injector";
 
-type TimerID = ReturnType<typeof setTimeout>;
-
 const DEFAULT_MOUSE_MOVEMENT = { x: 0, y: 0 };
 const DELAY = 300;
 const MOUSE_MOVEMENT_THRESHOLD = 3;
+
+type TimerID = ReturnType<typeof setTimeout>;
 
 export class Trigger {
   private injector: Injector;
