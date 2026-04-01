@@ -10,7 +10,7 @@
     "isolatedModules": true,
 
     /* Language and Environment */
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "moduleDetection": "force",
 
     /* Modules */
