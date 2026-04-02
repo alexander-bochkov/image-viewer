@@ -21,6 +21,7 @@
       "ui": ["./src/ui/index"],
       "ui/*": ["./src/ui/*"]
     },
+    "types": ["chrome", "vite-plugin-svgr/client", "vite/client"],
 
     /* Type Checking */
     "noFallthroughCasesInSwitch": true,

@@ -25,12 +25,15 @@ export class Injector {
   }
 
   private linkStylesToShadowRoot() {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    // biome-ignore lint/suspicious/noTsIgnore: TS6 cannot find type from @types/chrome
-    // @ts-ignore
-    link.href = chrome.runtime.getURL("content.css");
-    this.shadowRoot.appendChild(link);
+    const manifest = chrome.runtime.getManifest();
+    const path = manifest.content_scripts?.[0].css?.[0];
+
+    if (path) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = chrome.runtime.getURL(path);
+      this.shadowRoot.appendChild(link);
+    }
   }
 
   private startObserver() {
