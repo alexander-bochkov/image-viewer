@@ -1,8 +1,10 @@
 {
+  "$schema": "https://json.schemastore.org/chrome-manifest.json",
+
   "manifest_version": 3,
   "name": "SwiftView",
   "version": "0.1.0",
-  "description": "Google Chrome extension for viewing images.",
+  "description": "View images and videos in a separate modal window.",
 
   "content_scripts": [
     {
