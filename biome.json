@@ -41,7 +41,6 @@
     ]
   },
   "formatter": {
-    "formatWithErrors": true,
     "useEditorconfig": true
   },
   "linter": {
